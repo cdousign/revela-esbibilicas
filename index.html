@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Revelações Bíblica – Livro Digital</title>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      background-color: #0b0b0f;
+      color: #f5f5f5;
+    }
+
+    .page {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 16px 20px 40px;
+    }
+
+    h1, h2, h3 {
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 0.2rem;
+    }
+
+    h2 {
+      font-size: 1.2rem;
+      margin-top: 1.8rem;
+      margin-bottom: 0.4rem;
+    }
+
+    h3 {
+      font-size: 1rem;
+      margin-top: 1.2rem;
+      margin-bottom: 0.3rem;
+    }
+
+    p {
+      margin: 0.4rem 0 0.4rem;
+      text-align: justify;
+    }
+
+    .subtitulo {
+      font-size: 0.95rem;
+      color: #c3c3d4;
+      margin-bottom: 1.2rem;
+    }
+
+    .saudacao {
+      font-style: italic;
+      color: #d9d9ff;
+      margin-bottom: 1rem;
+    }
+
+    .verso {
+      margin: 0.7rem 0;
+      padding: 0.6rem 0.8rem;
+      border-left: 3px solid #4444aa;
+      background: rgba(255, 255, 255, 0.02);
+      font-size: 0.95rem;
+    }
+
+    .verso small {
+      display: block;
+      margin-top: 0.2rem;
+      font-size: 0.8rem;
+      color: #b0b0c8;
+    }
+
+    .nota {
+      font-size: 0.85rem;
+      color: #b0b0c0;
+      margin: 0.2rem 0 0.8rem;
+    }
+
+    ul {
+      padding-left: 1.1rem;
+      margin: 0.4rem 0 0.8rem;
+    }
+
+    li {
+      margin: 0.2rem 0;
+    }
+
+    .destaque {
+      font-weight: 600;
+      color: #ffe58a;
+    }
+
+    .resumo-final {
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid #29293a;
+    }
+
+    .tag-capitulo {
+      display: inline-block;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #9fa4ff;
+      margin-bottom: 0.4rem;
+    }
+
+    .pergunta {
+      font-weight: 600;
+      color: #ffe58a;
+    }
+
+    /* CABEÇALHO / MENU SUPERIOR */
+
+    header.site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: #050509ee;
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid #1e1e2e;
+    }
+
+    .nav-container {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 12px;
+    }
+
+    nav.nav-links {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+    }
+
+    .nav-list {
+      display: flex;
+      gap: 8px;
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    .nav-list li {
+      position: relative;
+    }
+
+    .nav-btn {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid #2b2b40;
+      font-size: 0.82rem;
+      text-decoration: none;
+      color: #d0d0ff;
+      background: #11111a;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .nav-btn:hover {
+      border-color: #4b4b80;
+      background: #1a1a26;
+    }
+
+    .nav-btn-primary {
+      border-color: #6366f1;
+      background: #1d1f3a;
+      color: #ffffff;
+    }
+
+    /* DROPDOWN DE CAPÍTULOS (SÓ CSS) */
+
+    .dropdown {
+      position: relative;
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: 110%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #11111a;
+      border: 1px solid #2b2b40;
+      border-radius: 10px;
+      padding: 6px;
+      display: none;
+      min-width: 140px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      z-index: 200;
+    }
+
+    .dropdown:hover .dropdown-menu {
+      display: block;
+    }
+
+    .dropdown-menu button {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: #e0e0ff;
+      font-size: 0.8rem;
+      text-align: left;
+      padding: 4px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .dropdown-menu button:hover {
+      background: #1e1e2e;
+    }
+
+    /* TÍTULO GERAL ABAIXO DO MENU */
+
+    .global-title-wrapper {
+      max-width: 900px;
+      margin: 8px auto 0;
+      padding: 0 20px 4px;
+    }
+
+    .global-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #f5f5ff;
+      text-align: center;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    main {
+      padding-top: 8px;
+    }
+
+    /* PÁGINAS (SEÇÕES) */
+
+    .page-section {
+      display: none;
+    }
+
+    .page-section.active {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="nav-container">
+      <nav class="nav-links">
+        <ul class="nav-list">
+          <li>
+            <button class="nav-btn nav-btn-primary" type="button" onclick="showSection('intro')">
+              INTRODUÇÃO
+            </button>
+          </li>
+
+          <li class="dropdown">
+            <button class="nav-btn" type="button">
+              CAPÍTULOS ▾
+            </button>
+            <div class="dropdown-menu">
+              <button type="button" onclick="showSection('cap1')">Capítulo 1</button>
+              <button type="button" onclick="showSection('cap2')">Capítulo 2</button>
+              <button type="button" onclick="showSection('cap3')">Capítulo 3</button>
+              <button type="button" onclick="showSection('cap4')">Capítulo 4</button>
+              <button type="button" onclick="showSection('cap5')">Capítulo 5</button>
+              <button type="button" onclick="showSection('cap6')">Capítulo 6</button>
+              <button type="button" onclick="showSection('cap7')">Capítulo 7</button>
+              <button type="button" onclick="showSection('cap8')">Capítulo 8</button>
+              <button type="button" onclick="showSection('cap9')">Capítulo 9</button>
+            </div>
+          </li>
+
+          <li>
+            <button class="nav-btn" type="button" onclick="showSection('testemunhos')">
+              TESTEMUNHOS
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <div class="global-title-wrapper">
+      <div class="global-title">
+        Revelações Bíblica
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="page">
+
+      <!-- ========== INTRODUÇÃO ========== -->
+      <section id="intro" class="page-section active">
+        <div class="tag-capitulo">Introdução</div>
+        <h1>Por que este livro existe</h1>
+        <p class="subtitulo">
+          Não é um livro de curiosidade teológica. É um chamado para os que já despertaram
+          para a verdade de Jesus Cristo e querem entender o que o Espírito Santo está
+          revelando sobre o tempo em que vivemos.
+        </p>
+
+        <p class="saudacao">
+          Que a paz e a verdade do nosso Senhor Jesus Cristo encham o teu coração
+          enquanto você lê estas linhas.
+        </p>
+
+        <p>
+          Este livro não é um manual de igreja, nem um estudo frio de teologia.
+          Ele nasce de uma série de revelações, confrontos espirituais, libertações
+          e discernimentos que o Espírito Santo tem gerado ao longo do tempo —
+          no meio da vida real, em guerra contra o pecado, contra o mundo
+          e contra o sistema do dragão.
+        </p>
+
+        <p>
+          Se você é apenas curioso, provavelmente este conteúdo vai te parecer pesado,
+          exagerado ou até estranho. Mas se o Espírito já te incomodou, já te chamou
+          ao arrependimento, já te mostrou a podridão do sistema deste mundo,
+          então você vai perceber algo diferente aqui:
+          <span class="destaque">
+            um alinhamento profundo entre Bíblia, história e revelação.
+          </span>
+        </p>
+
+        <p>
+          O foco não é criar uma nova doutrina, nem inventar mais uma linha denominacional.
+          O foco é:
+        </p>
+
+        <ul>
+          <li>Entender o que é realmente o Reino de Deus.</li>
+          <li>Compreender a vinda de Jesus de forma espiritual e pessoal.</li>
+          <li>Discernir o sistema do anticristo que já está em operação.</li>
+          <li>Reconhecer a missão dos remanescentes nos últimos dias.</li>
+        </ul>
+
+        <p>
+          A linguagem aqui é direta, simples, às vezes dura. É o estilo que Jesus
+          usou em Mateus 10 quando enviou os discípulos: falar com quem já
+          conhece o Nome, mas está preso na religião, no pecado, na confusão
+          espiritual e no sistema de um mundo que jaz no maligno.
+        </p>
+
+        <p>
+          Ao longo dos nove capítulos, vamos andar por:
+        </p>
+
+        <ul>
+          <li><strong>Lucas 17</strong> — Reino dentro, vinda na morte.</li>
+          <li><strong>Gênesis 3</strong> — queda, serpente e guerra espiritual.</li>
+          <li><strong>Daniel 7, 10–12</strong> — reinos, eras e bastidores espirituais.</li>
+          <li><strong>Apocalipse 2–3</strong> — perfil das igrejas e corrupção.</li>
+          <li><strong>Apocalipse 13</strong> — sistema do dragão, bestas, marca e imagem.</li>
+          <li><strong>Mateus 10</strong> — missão final dos enviados.</li>
+        </ul>
+
+        <p>
+          Tudo isso não como teoria solta, mas como um mapa espiritual:
+          <span class="destaque">
+            vida = tribunal em andamento; morte = encontro com o Juiz;
+            história = cenário da guerra entre o Reino de Deus e o reino do mal.
+          </span>
+        </p>
+
+        <p class="pergunta">
+          Se depois desta introdução você sente que o Espírito Santo está te chamando
+          para ler com seriedade, então siga adiante.
+        </p>
+
+        <p>
+          Se for apenas curiosidade, é melhor parar aqui — porque o que vem
+          pela frente não é entretenimento espiritual, é confronto.
+        </p>
+
+        <p>
+          Vamos começar pelo princípio de tudo:
+          <strong>o Reino de Deus dentro do homem</strong>.
+        </p>
+      </section>
+
+      <!-- ========== CAPÍTULO 1 ========== -->
+      <section id="cap1" class="page-section">
+        <div class="tag-capitulo">Capítulo 1</div>
+        <h1>O Reino de Deus Dentro do Homem</h1>
+        <p class="subtitulo">
+          Entendendo Lucas 17 e o início de toda a revelação: o Reino é vida, a vinda é morte.
+        </p>
+
+        <section>
+          <p class="saudacao">
+            Que a paz e a verdade do nosso Senhor Jesus Cristo encham o teu coração
+            enquanto você lê estas linhas.
+          </p>
+
+          <p class="pergunta">
+            Se eu te perguntar agora: onde está o Reino de Deus… o que você responderia?
+          </p>
+
+          <p>
+            A maioria diria: “no céu”, “lá em cima”, “na igreja”, “num lugar futuro
+            para onde a gente vai depois que morre”.
+            Mas Jesus Cristo ensinou algo muito diferente. E se você não entender isso,
+            todo o resto da revelação se perde.
+          </p>
+
+          <h2>1. O Reino de Deus não é um lugar visível</h2>
+
+          <p>
+            Em <strong>Lucas 17:20–21</strong>, os fariseus perguntam a Jesus
+            quando viria o Reino de Deus. Eles eram especialistas em religião,
+            mas cegos para a verdade.
+          </p>
+
+          <div class="verso">
+            <p>
+              “Os fariseus perguntaram a Jesus quando seria que o Reino de Deus ia chegar.
+              Ele respondeu: — <strong>Quando vocês virem o Reino de Deus chegar,
+              não vão poder dizer: ‘Ele está aqui’ ou ‘Ele está ali’, pois o Reino de Deus
+              está dentro de vocês</strong>.”
+            </p>
+            <small>Lucas 17:20–21 — NTLH</small>
+          </div>
+
+          <p>
+            Nas outras versões (ARA, NAA, NVI), Jesus diz que o Reino não vem com
+            “aparência visível”. A NTLH deixa escancarado:
+            <span class="destaque">“o Reino de Deus está dentro de vocês”</span>.
+          </p>
+
+          <p>
+            Ou seja: o Reino não é um país, um templo, uma placa de igreja,
+            um evento político ou um show gospel.  
+            O Reino é o governo de Deus entrando dentro do homem.
+          </p>
+
+          <h2>2. A vinda de Jesus é individual</h2>
+
+          <p>
+            No mesmo capítulo, Jesus vira dos fariseus para os discípulos e muda o tom:
+          </p>
+
+          <div class="verso">
+            <p>
+              “Virão dias em que vocês desejarão ver ao menos um dos dias do Filho do Homem,
+              mas não o verão.”  
+            </p>
+            <small>Lucas 17:22</small>
+          </div>
+
+          <p>
+            Ele avisa: muitos dirão “Ele está aqui” ou “Ele está ali”.
+            Mas não é pra correr atrás de sinais, de lugares, de pessoas.
+          </p>
+
+          <div class="verso">
+            <p>
+              “Pois, assim como o relâmpago brilha de uma ponta a outra do céu,
+              assim será o Filho do Homem no seu dia.”  
+            </p>
+            <small>Lucas 17:24</small>
+          </div>
+
+          <p>
+            O relâmpago aparece em um instante e corta tudo.  
+            Assim é a vinda de Jesus na vida de cada pessoa:
+            <span class="destaque">um encontro repentino, definitivo, no dia da morte</span>.
+          </p>
+
+          <h2>3. Vida = tempo de julgamento, morte = encontro com o Rei</h2>
+
+          <p>
+            Jesus compara com os dias de Noé e de Ló:
+          </p>
+
+          <div class="verso">
+            <p>
+              “As pessoas comiam e bebiam, casavam e se davam em casamento…  
+              até o dia em que Noé entrou na arca, e veio o dilúvio e destruiu a todos.”  
+            </p>
+            <small>Lucas 17:27</small>
+          </div>
+
+          <p>
+            A vida seguia “normal” até a hora em que o juízo caiu.
+            Hoje é igual: as pessoas seguem sua rotina,
+            achando que está tudo bem, até que o corpo cai
+            e o espírito encontra o Rei.
+          </p>
+
+          <div class="verso">
+            <p>
+              “Naquela noite, duas pessoas estarão numa cama: uma será levada,
+              e a outra será deixada.”  
+            </p>
+            <small>Lucas 17:34</small>
+          </div>
+
+          <p>
+            Isso não é um arrebatamento coletivo de filme.  
+            É a realidade de cada morte:  
+            <span class="destaque">
+              um é achado em Cristo e entra no Reino;  
+              o outro é achado no mundo e fica de fora.
+            </span>
+          </p>
+
+          <div class="verso">
+            <p>
+              “Onde estiver o corpo, ali se ajuntarão também os abutres.”  
+            </p>
+            <small>Lucas 17:37</small>
+          </div>
+
+          <p>
+            Jesus fecha o ensino apontando para a morte física:
+            onde há um corpo morto, ali termina a chance de decidir.
+            A vida é o tribunal em andamento.  
+            A morte é o veredito sendo revelado.
+          </p>
+
+          <div class="resumo-final">
+            <h2>Resumo do Capítulo 1</h2>
+
+            <ul>
+              <li>O Reino de Deus não é um lugar visível — é o governo de Deus dentro do homem.</li>
+              <li>A vinda de Jesus é individual, ligada ao dia da nossa morte.</li>
+              <li>A vida é o tempo em que estamos sendo julgados nas escolhas.</li>
+              <li>A morte não muda ninguém, só revela quem nos tornamos.</li>
+            </ul>
+
+            <p class="pergunta">
+              Então, hoje, o Reino de Deus já está governando dentro de você
+              ou você só conhece Jesus de ouvir falar?
+            </p>
+
+            <p>
+              Se você percebe que ainda está longe, não se desespere —
+              mas também não finja que está tudo bem.  
+              Fale com Deus com sinceridade:
+            </p>
+
+            <p>
+              “Jesus, eu não quero só religião.  
+              Eu quero o Teu Reino dentro de mim.  
+              Confronta o meu pecado e começa hoje o Teu governo no meu coração.”
+            </p>
+
+            <p>
+              No próximo capítulo, vamos voltar ao início de tudo:
+              <strong>a queda, a serpente e a guerra espiritual que começou no Éden</strong>.
+            </p>
+          </div>
+        </section>
+      </section>
+
+      <!-- ========== CAPÍTULO 2 ========== -->
+      <section id="cap2" class="page-section">
+        <div class="tag-capitulo">Capítulo 2</div>
+        <h1>A Queda, o Pecado, a Serpente e a Guerra Espiritual</h1>
+        <p class="subtitulo">
+          Entenda o que realmente aconteceu no Éden, por que a serpente foi amaldiçoada
+          e como isso revelou a batalha espiritual que define toda a existência humana.
+        </p>
+
+        <section>
+          <p class="saudacao">
+            Que a verdade do Espírito Santo abra seus olhos enquanto você lê estas palavras.
+          </p>
+
+          <p>
+            Agora que você entendeu que o Reino de Deus é <strong>interior</strong>,
+            e que a vida é o tempo em que somos julgados, precisamos voltar ao começo:
+            <span class="destaque">o Éden</span>.
+          </p>
+
+          <p>
+            Porque ali começou a guerra espiritual que estamos enfrentando até hoje.
+          </p>
+
+          <h2>1. Quem realmente pecou no Éden?</h2>
+
+          <p>
+            Muita gente pensa que tudo começou com Adão e Eva.  
+            Mas a Bíblia mostra que já havia um agente caído ali dentro:
+          </p>
+
+          <div class="verso">
+            <p>
+              “Ora, a serpente era o mais astuto de todos os animais do campo…”
+            </p>
+            <small>Gênesis 3:1 — NTLH</small>
+          </div>
+
+          <p>
+            A serpente não era neutra. Ela já estava corrompida.  
+            Jesus revela quem estava por trás dela:
+          </p>
+
+          <div class="verso">
+            <p>
+              “Ele foi homicida desde o princípio... e é o pai da mentira.”
+            </p>
+            <small>João 8:44 — NTLH</small>
+          </div>
+
+          <p>
+            Então a ordem é:
+          </p>
+
+          <ul>
+            <li><strong>Primeiro</strong> peca o espírito da serpente (Satanás).</li>
+            <li><strong>Depois</strong> Eva, enganada.</li>
+            <li><strong>Depois</strong> Adão, aceitando a queda junto com ela.</li>
+          </ul>
+
+          <p>
+            A queda não começou no homem.  
+            A queda começou na rebelião espiritual.
+          </p>
+
+          <h2>2. Por que a serpente foi amaldiçoada?</h2>
+
+          <p>
+            Se a serpente só “cumprisse um papel”, Deus não a amaldiçoaria.
+            Mas Deus julga a serpente porque ela agiu por vontade própria
+            contra o plano de Deus.
+          </p>
+
+          <div class="verso">
+            <p>
+              “Você vai rastejar sobre o seu ventre e comer pó todos os dias da sua vida.”
+            </p>
+            <small>Gênesis 3:14</small>
+          </div>
+
+          <p>
+            Rastejar = tornar-se menor do que todos.  
+            Comer pó = alimentar-se do homem, que foi feito do pó.
+          </p>
+
+          <p class="destaque">
+            O maligno se alimenta da queda humana.  
+            Cada pecado é alimento para o reino das trevas.
+          </p>
+
+          <h2>3. O homem que se torna demônio</h2>
+
+          <p>
+            A revelação que o Espírito te deu é simples e profunda:
+          </p>
+
+          <p class="destaque">
+            Assim como um santo, ao morrer, permanece santo e se junta ao Reino de Deus,
+            o ímpio, ao morrer, permanece ímpio e se junta ao reino das trevas.
+          </p>
+
+          <div class="verso">
+            <p>
+              “Quem é injusto continue na injustiça.  
+              Quem é santo continue a santificar-se.”
+            </p>
+            <small>Apocalipse 22:11</small>
+          </div>
+
+          <p>
+            A morte não muda ninguém.  
+            A morte só sela o que a pessoa se tornou em vida.
+          </p>
+
+          <ul>
+            <li>O santo continua santo — e passa a fazer parte do Reino da luz.</li>
+            <li>O ímpio continua ímpio — e passa a reforçar o reino das trevas.</li>
+          </ul>
+
+          <h2>4. O santo que se torna “anjo”</h2>
+
+          <p>
+            A Bíblia dá vislumbres disso:
+          </p>
+
+          <p class="destaque">
+            Moisés e Elias aparecem glorificados com Jesus.
+          </p>
+
+          <div class="verso">
+            <p>
+              “E apareceram Moisés e Elias, falando com Jesus.”
+            </p>
+            <small>Mateus 17:3</small>
+          </div>
+
+          <p>
+            A descrição é igual à dos anjos:
+          </p>
+
+          <ul>
+            <li>Roupas brancas.</li>
+            <li>Glória.</li>
+            <li>Presença celestial.</li>
+          </ul>
+
+          <div class="verso">
+            <p>
+              “Suas roupas brilhavam como relâmpago...”
+            </p>
+            <small>Lucas 24:4</small>
+          </div>
+
+          <p>
+            Em Apocalipse vemos:
+          </p>
+
+          <div class="verso">
+            <p>
+              “Os exércitos do céu o seguiam, vestidos de linho finíssimo, branco e puro.”
+            </p>
+            <small>Apocalipse 19:14</small>
+          </div>
+
+          <p>
+            Esses exércitos são os santos glorificados, não anjos “neutros”.
+            É o povo que venceu em vida e agora participa da guerra espiritual
+            do lado de Cristo.
+          </p>
+
+          <h2>5. O reino das trevas vs o Reino da luz</h2>
+
+          <p>
+            A partir do Éden, dois reinos passaram a atuar sobre a terra:
+          </p>
+
+          <ul>
+            <li><strong>Reino de Deus:</strong> luz, ordem, santidade, vida.</li>
+            <li><strong>Reino das trevas:</strong> mentira, corrupção, morte, caos.</li>
+          </ul>
+
+          <div class="verso">
+            <p>
+              “Ele nos libertou do poder das trevas e nos trouxe para o Reino
+              do Seu Filho amado.”
+            </p>
+            <small>Colossenses 1:13</small>
+          </div>
+
+          <p>
+            Ninguém nasce neutro.  
+            Ou está debaixo do domínio das trevas,  
+            ou é arrancado de lá e colocado no Reino de Cristo.
+          </p>
+
+          <p class="destaque">
+            Todo ser humano está em guerra, queira ou não.
+          </p>
+
+          <h2>6. Por que o mundo jaz no maligno</h2>
+
+          <div class="verso">
+            <p>
+              “O mundo inteiro jaz no maligno.”
+            </p>
+            <small>1 João 5:19</small>
+          </div>
+
+          <p>
+            Satanás perdeu o Éden, mas ganhou o resto do mundo:
+          </p>
+
+          <div class="verso">
+            <p>
+              “Todos os reinos do mundo me foram entregues, e eu os dou a quem eu quiser.”
+            </p>
+            <small>Lucas 4:6</small>
+          </div>
+
+          <p>
+            Jesus não contesta.  
+            Isso mostra que:
+          </p>
+
+          <ul>
+            <li>O sistema político é inclinado ao mal.</li>
+            <li>O sistema econômico é inclinado ao egoísmo.</li>
+            <li>O sistema religioso pode ser corrompido.</li>
+          </ul>
+
+          <p>
+            Este é o cenário: o Reino de Deus dentro de você,
+            cercado por um mundo governado pelo maligno.
+          </p>
+
+          <h2>7. A vida como treinamento espiritual</h2>
+
+          <p class="destaque">
+            A vida é um campo de treinamento para definir
+            de qual reino você fará parte eternamente.
+          </p>
+
+          <ul>
+            <li>O Espírito Santo te puxa para cima.</li>
+            <li>O mundo e a serpente tentam te puxar para baixo.</li>
+          </ul>
+
+          <div class="verso">
+            <p>
+              “Quem quiser salvar a sua vida, perdê-la-á;  
+              mas quem perder a sua vida por Minha causa, encontrá-la-á.”
+            </p>
+            <small>Mateus 16:25</small>
+          </div>
+
+          <p>
+            Cada escolha é um tijolo no seu destino eterno.
+            A morte não muda ninguém, só revela quem você se tornou.
+          </p>
+
+          <div class="resumo-final">
+            <h2>Resumo do Capítulo 2</h2>
+
+            <ul>
+              <li>A serpente pecou antes do homem.</li>
+              <li>Adão e Eva foram enganados, mas também responsáveis.</li>
+              <li>A serpente foi amaldiçoada e passou a se alimentar da queda humana.</li>
+              <li>O ímpio morto continua ímpio; o santo morto continua santo.</li>
+              <li>Os santos glorificados participam do exército de Deus.</li>
+              <li>O mundo inteiro jaz no maligno.</li>
+              <li>A vida é treinamento para definir seu lugar eterno.</li>
+            </ul>
+
+            <p class="pergunta">
+              Com qual reino suas escolhas estão se alinhando hoje?
+            </p>
+
+            <p>
+              No próximo capítulo, vamos aprofundar:
+              <strong>a vinda de Jesus na morte de cada pessoa
+              e o que isso muda na forma de enxergar o “fim dos tempos”</strong>.
+            </p>
+          </div>
+        </section>
+      </section>
+
+      <!-- ========== CAPÍTULO 3 ========== -->
+      <section id="cap3" class="page-section">
+        <div class="tag-capitulo">Capítulo 3</div>
+        <h1>A Vinda de Jesus na Morte e o Fim Individual</h1>
+        <p class="subtitulo">Conteúdo em construção — será inserido depois.</p>
+      </section>
+
+      <!-- ========== CAPÍTULO 4 ========== -->
+      <section id="cap4" class="page-section">
+        <div class="tag-capitulo">Capítulo 4</div>
+        <h1>Daniel 10–12: As Três Eras</h1>
+        <p class="subtitulo">Conteúdo em construção — será inserido depois.</p>
+      </section>
+
+      <!-- ========== CAPÍTULO 5 ========== -->
+      <section id="cap5" class="page-section">
+        <div class="tag-capitulo">Capítulo 5</div>
+        <h1>As Sete Igrejas e o Fim</h1>
+        <p class="subtitulo">Conteúdo em construção — será inserido depois.</p>
+      </section>
+
+      <!-- ========== CAPÍTULO 6 ========== -->
+      <section id="cap6" class="page-section">
+        <div class="tag-capitulo">Capítulo 6</div>
+        <h1>A Primeira Besta e o Sistema Mundial</h1>
+        <p class="subtitulo">Conteúdo em construção — será inserido depois.</p>
+      </section>
+
+      <!-- ========== CAPÍTULO 7 ========== -->
+      <section id="cap7" class="page-section">
+        <div class="tag-capitulo">Capítulo 7</div>
+        <h1>A Segunda Besta, a Imagem e a Marca</h1>
+        <p class="subtitulo">Conteúdo em construção — será inserido depois.</p>
+      </section>
+
+      <!-- ========== CAPÍTULO 8 ========== -->
+      <section id="cap8" class="page-section">
+        <div class="tag-capitulo">Capítulo 8</div>
+        <h1>O Remanescente e a Missão Final</h1>
+        <p class="subtitulo">Conteúdo em construção — será inserido depois.</p>
+      </section>
+
+      <!-- ========== CAPÍTULO 9 ========== -->
+      <section id="cap9" class="page-section">
+        <div class="tag-capitulo">Capítulo 9</div>
+        <h1>O Último Tempo e a Glória dos Santos</h1>
+        <p class="subtitulo">Conteúdo em construção — será inserido depois.</p>
+      </section>
+
+      <!-- ========== TESTEMUNHOS ========== -->
+      <section id="testemunhos" class="page-section">
+        <div class="tag-capitulo">Testemunhos</div>
+        <h1>Testemunhos de Libertação e Revelação</h1>
+        <p class="subtitulo">
+          Espaço para registrar experiências reais de conversão, libertação
+          e confirmação daquilo que o Espírito Santo tem falado.
+        </p>
+      </section>
+
+    </div>
+  </main>
+
+  <script>
+    function showSection(id) {
+      var sections = document.querySelectorAll('.page-section');
+      for (var i = 0; i < sections.length; i++) {
+        sections[i].classList.remove('active');
+      }
+
+      var target = document.getElementById(id);
+      if (target) {
+        target.classList.add('active');
+      }
+
+      window.scrollTo(0, 0);
+    }
+  </script>
+</body>
+</html>
