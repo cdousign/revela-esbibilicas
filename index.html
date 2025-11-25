@@ -1128,50 +1128,54 @@
     </div>
   </main>
 
- <script>
+<script>
   function showSection(id) {
-    // —————————————
     // 1. Esconde todas as páginas
-    // —————————————
     var sections = document.querySelectorAll('.page-section');
     for (var i = 0; i < sections.length; i++) {
       sections[i].classList.remove('active');
     }
 
-    // —————————————
     // 2. Mostra a página clicada
-    // —————————————
     var target = document.getElementById(id);
     if (target) {
       target.classList.add('active');
     }
 
-    // —————————————
-    // 3. Remove destaque de todos botões
-    // —————————————
+    // 3. Remove destaque de todos os botões
     var allButtons = document.querySelectorAll('.nav-btn');
     for (var b = 0; b < allButtons.length; b++) {
       allButtons[b].classList.remove('nav-btn-primary');
     }
 
-    // —————————————
     // 4. Ativa o botão correspondente
-    // —————————————
     if (id === 'intro') {
       document.getElementById('btn-intro').classList.add('nav-btn-primary');
-    } 
-    else if (id === 'testemunhos') {
+    } else if (id === 'testemunhos') {
       document.getElementById('btn-testemunhos').classList.add('nav-btn-primary');
-    }
-    else if (id.startsWith('cap')) {
+    } else if (id.startsWith('cap')) {
       document.getElementById('btn-caps').classList.add('nav-btn-primary');
     }
 
-    // —————————————
-    // 5. Volta para o topo
-    // —————————————
+    // 5. Atualiza a âncora da URL (#intro, #cap2, #testemunhos...)
+    window.location.hash = id;
+
+    // 6. Volta para o topo
     window.scrollTo(0, 0);
   }
+
+  // Quando a página carregar, abre a seção baseada na âncora da URL
+  document.addEventListener('DOMContentLoaded', function () {
+    var hash = window.location.hash.replace('#', '');
+
+    if (hash) {
+      // Se tiver #cap2, #testemunhos etc, abre essa página
+      showSection(hash);
+    } else {
+      // Se não tiver nada na URL, cai na INTRODUÇÃO
+      showSection('intro');
+    }
+  });
 </script>
 </body>
 </html>
