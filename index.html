@@ -264,36 +264,36 @@
   <header class="site-header">
     <div class="nav-container">
       <nav class="nav-links">
-        <ul class="nav-list">
-          <li>
-            <button class="nav-btn nav-btn-primary" type="button" onclick="showSection('intro')">
-              INTRODUÇÃO
-            </button>
-          </li>
+<ul class="nav-list">
+  <li>
+    <button id="btn-intro" class="nav-btn nav-btn-primary" type="button" onclick="showSection('intro')">
+      INTRODUÇÃO
+    </button>
+  </li>
 
-          <li class="dropdown">
-            <button class="nav-btn" type="button">
-              CAPÍTULOS ▾
-            </button>
-            <div class="dropdown-menu">
-              <button type="button" onclick="showSection('cap1')">Capítulo 1</button>
-              <button type="button" onclick="showSection('cap2')">Capítulo 2</button>
-              <button type="button" onclick="showSection('cap3')">Capítulo 3</button>
-              <button type="button" onclick="showSection('cap4')">Capítulo 4</button>
-              <button type="button" onclick="showSection('cap5')">Capítulo 5</button>
-              <button type="button" onclick="showSection('cap6')">Capítulo 6</button>
-              <button type="button" onclick="showSection('cap7')">Capítulo 7</button>
-              <button type="button" onclick="showSection('cap8')">Capítulo 8</button>
-              <button type="button" onclick="showSection('cap9')">Capítulo 9</button>
-            </div>
-          </li>
+  <li class="dropdown">
+    <button id="btn-caps" class="nav-btn" type="button">
+      CAPÍTULOS ▾
+    </button>
+    <div class="dropdown-menu">
+      <button type="button" onclick="showSection('cap1')">Capítulo 1</button>
+      <button type="button" onclick="showSection('cap2')">Capítulo 2</button>
+      <button type="button" onclick="showSection('cap3')">Capítulo 3</button>
+      <button type="button" onclick="showSection('cap4')">Capítulo 4</button>
+      <button type="button" onclick="showSection('cap5')">Capítulo 5</button>
+      <button type="button" onclick="showSection('cap6')">Capítulo 6</button>
+      <button type="button" onclick="showSection('cap7')">Capítulo 7</button>
+      <button type="button" onclick="showSection('cap8')">Capítulo 8</button>
+      <button type="button" onclick="showSection('cap9')">Capítulo 9</button>
+    </div>
+  </li>
 
-          <li>
-            <button class="nav-btn" type="button" onclick="showSection('testemunhos')">
-              TESTEMUNHOS
-            </button>
-          </li>
-        </ul>
+  <li>
+    <button id="btn-testemunhos" class="nav-btn" type="button" onclick="showSection('testemunhos')">
+      TESTEMUNHOS
+    </button>
+  </li>
+</ul>
       </nav>
     </div>
 
@@ -1128,20 +1128,50 @@
     </div>
   </main>
 
-  <script>
-    function showSection(id) {
-      var sections = document.querySelectorAll('.page-section');
-      for (var i = 0; i < sections.length; i++) {
-        sections[i].classList.remove('active');
-      }
-
-      var target = document.getElementById(id);
-      if (target) {
-        target.classList.add('active');
-      }
-
-      window.scrollTo(0, 0);
+ <script>
+  function showSection(id) {
+    // —————————————
+    // 1. Esconde todas as páginas
+    // —————————————
+    var sections = document.querySelectorAll('.page-section');
+    for (var i = 0; i < sections.length; i++) {
+      sections[i].classList.remove('active');
     }
-  </script>
+
+    // —————————————
+    // 2. Mostra a página clicada
+    // —————————————
+    var target = document.getElementById(id);
+    if (target) {
+      target.classList.add('active');
+    }
+
+    // —————————————
+    // 3. Remove destaque de todos botões
+    // —————————————
+    var allButtons = document.querySelectorAll('.nav-btn');
+    for (var b = 0; b < allButtons.length; b++) {
+      allButtons[b].classList.remove('nav-btn-primary');
+    }
+
+    // —————————————
+    // 4. Ativa o botão correspondente
+    // —————————————
+    if (id === 'intro') {
+      document.getElementById('btn-intro').classList.add('nav-btn-primary');
+    } 
+    else if (id === 'testemunhos') {
+      document.getElementById('btn-testemunhos').classList.add('nav-btn-primary');
+    }
+    else if (id.startsWith('cap')) {
+      document.getElementById('btn-caps').classList.add('nav-btn-primary');
+    }
+
+    // —————————————
+    // 5. Volta para o topo
+    // —————————————
+    window.scrollTo(0, 0);
+  }
+</script>
 </body>
 </html>
