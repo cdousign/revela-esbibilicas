@@ -1,1767 +1,1266 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Revelações Bíblica – Livro Digital</title>
-
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LEV — Console Textual</title>
   <style>
-    
-    .palavra {
-  color: #ff4d4d;     /* vermelho suave */
-  font-style: italic; /* deixa em itálico */
-  font-weight: 600;   /* leve destaque */
-}
-
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        Roboto, sans-serif;
-      font-size: 16px;
-      line-height: 1.7;
-      background-color: #0b0b0f;
-      color: #f5f5f5;
+    :root{
+      --bg:#0b0f17; --panel:#0f1624; --panel2:#101b2d;
+      --text:#e8eefc; --muted:#a9b6d3; --accent:#7aa2ff;
+      --danger:#ff6b7a; --ok:#4ee6a8; --warn:#ffd36b;
+      --border:rgba(255,255,255,.08);
+      --shadow:0 18px 40px rgba(0,0,0,.45);
+      --radius:16px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
     }
-
-    .page {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 16px 20px 40px;
+    *{box-sizing:border-box}
+    body{
+      margin:0; background: radial-gradient(1000px 700px at 15% 0%, rgba(122,162,255,.18), transparent 55%),
+               radial-gradient(900px 600px at 85% 10%, rgba(78,230,168,.12), transparent 55%),
+               var(--bg);
+      color:var(--text); font-family:var(--sans);
     }
-
-    h1, h2, h3 {
-      font-weight: 700;
-      line-height: 1.3;
+    a{color:var(--accent); text-decoration:none}
+    .wrap{max-width:1100px; margin:0 auto; padding:24px}
+    .topbar{
+      display:flex; gap:14px; align-items:center; justify-content:space-between;
+      padding:14px 16px; background:rgba(15,22,36,.7); border:1px solid var(--border);
+      border-radius:var(--radius); box-shadow:var(--shadow); backdrop-filter: blur(10px);
+      position:sticky; top:14px; z-index:10;
     }
-
-    h1 {
-      font-size: 1.6rem;
-      margin-bottom: 0.2rem;
+    .brand{display:flex; gap:12px; align-items:center}
+    .logo{
+      width:38px; height:38px; border-radius:12px;
+      background: linear-gradient(135deg, rgba(122,162,255,.85), rgba(78,230,168,.75));
+      box-shadow: 0 8px 24px rgba(122,162,255,.18);
     }
-
-    h2 {
-      font-size: 1.2rem;
-      margin-top: 1.8rem;
-      margin-bottom: 0.4rem;
+    .brand h1{font-size:15px; margin:0; letter-spacing:.3px}
+    .brand .sub{font-size:12px; color:var(--muted)}
+    .chips{display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:flex-end}
+    .chip{
+      font-size:12px; padding:7px 10px; border-radius:999px;
+      border:1px solid var(--border); background:rgba(16,27,45,.7);
+      color:var(--muted);
     }
-
-    h3 {
-      font-size: 1rem;
-      margin-top: 1.2rem;
-      margin-bottom: 0.3rem;
+    .chip b{color:var(--text)}
+    .chip.ok{border-color:rgba(78,230,168,.35); color:#c8ffe9}
+    .chip.warn{border-color:rgba(255,211,107,.35); color:#ffe9b8}
+    .chip.bad{border-color:rgba(255,107,122,.35); color:#ffd0d6}
+    .grid{
+      display:grid; grid-template-columns: 320px 1fr; gap:16px; margin-top:16px;
     }
-
-    p {
-      margin: 0.4rem 0 0.4rem;
-      text-align: justify;
+    @media (max-width: 920px){ .grid{grid-template-columns:1fr} }
+    .card{
+      background:rgba(15,22,36,.75); border:1px solid var(--border);
+      border-radius:var(--radius); box-shadow:var(--shadow); backdrop-filter: blur(10px);
+      overflow:hidden;
     }
-
-    .subtitulo {
-      font-size: 0.95rem;
-      color: #c3c3d4;
-      margin-bottom: 1.2rem;
+    .card h2{
+      margin:0; padding:14px 16px; font-size:13px; letter-spacing:.35px;
+      color:#dfe7ff; background: rgba(16,27,45,.6); border-bottom:1px solid var(--border);
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
     }
-
-    .saudacao {
-      font-style: italic;
-      color: #d9d9ff;
-      margin-bottom: 1rem;
+    .card .body{padding:14px 16px}
+    .muted{color:var(--muted); font-size:13px; line-height:1.4}
+    .btnrow{display:flex; gap:10px; flex-wrap:wrap}
+    button{
+      cursor:pointer; border:none; border-radius:12px; padding:10px 12px;
+      background:rgba(122,162,255,.14); color:var(--text);
+      border:1px solid rgba(122,162,255,.22);
+      transition: transform .06s ease, background .15s ease;
+      font-size:13px;
     }
-
-    .verso {
-      margin: 0.7rem 0;
-      padding: 0.6rem 0.8rem;
-      border-left: 3px solid #4444aa;
-      background: rgba(255, 255, 255, 0.02);
-      font-size: 0.95rem;
+    button:hover{background:rgba(122,162,255,.22)}
+    button:active{transform: translateY(1px)}
+    button.secondary{background:rgba(255,255,255,.06); border-color:var(--border)}
+    button.danger{background:rgba(255,107,122,.12); border-color:rgba(255,107,122,.22)}
+    button.ok{background:rgba(78,230,168,.12); border-color:rgba(78,230,168,.22)}
+    button.warn{background:rgba(255,211,107,.12); border-color:rgba(255,211,107,.22)}
+    .nav{
+      display:flex; flex-direction:column; gap:8px;
     }
-
-    .verso small {
-      display: block;
-      margin-top: 0.2rem;
-      font-size: 0.8rem;
-      color: #b0b0c8;
+    .nav button{width:100%; text-align:left; display:flex; justify-content:space-between; align-items:center}
+    .nav .hint{color:var(--muted); font-size:11px}
+    .field{display:flex; flex-direction:column; gap:6px; margin:10px 0}
+    label{font-size:12px; color:var(--muted)}
+    input, textarea, select{
+      width:100%;
+      background: rgba(16,27,45,.7);
+      border:1px solid var(--border);
+      color:var(--text);
+      border-radius:12px;
+      padding:10px 12px;
+      outline:none;
+      font-family:var(--sans);
+      font-size:13px;
     }
-
-    .nota {
-      font-size: 0.85rem;
-      color: #b0b0c0;
-      margin: 0.2rem 0 0.8rem;
+    textarea{min-height:180px; resize:vertical; font-family:var(--mono); font-size:12.5px; line-height:1.4}
+    .mono{font-family:var(--mono)}
+    .split{display:grid; grid-template-columns: 1fr 1fr; gap:12px}
+    @media (max-width: 920px){ .split{grid-template-columns:1fr} }
+    .hr{height:1px; background:var(--border); margin:12px 0}
+    .kpi{display:grid; grid-template-columns: repeat(3,1fr); gap:10px}
+    @media (max-width: 920px){ .kpi{grid-template-columns:1fr} }
+    .kpi .box{
+      border:1px solid var(--border); background:rgba(16,27,45,.55);
+      padding:10px 12px; border-radius:14px;
     }
-
-    ul {
-      padding-left: 1.1rem;
-      margin: 0.4rem 0 0.8rem;
+    .kpi .box .t{font-size:11px; color:var(--muted)}
+    .kpi .box .v{font-size:14px; margin-top:4px}
+    .toast{
+      position: fixed; right:16px; bottom:16px; max-width:520px;
+      background: rgba(15,22,36,.95); border:1px solid var(--border); color:var(--text);
+      border-radius: 14px; padding: 12px 14px; box-shadow:var(--shadow);
+      display:none;
     }
-
-    li {
-      margin: 0.2rem 0;
+    .toast .small{color:var(--muted); font-size:12px; margin-top:4px}
+    .pill{
+      display:inline-block; font-size:11px; padding:5px 8px; border-radius:999px;
+      border:1px solid var(--border); background:rgba(255,255,255,.05); color:var(--muted);
     }
-
-    .destaque {
-      font-weight: 600;
-      color: #ffe58a;
-    }
-
-    .resumo-final {
-      margin-top: 2rem;
-      padding-top: 1rem;
-      border-top: 1px solid #29293a;
-    }
-
-    .tag-capitulo {
-      display: inline-block;
-      font-size: 0.75rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #9fa4ff;
-      margin-bottom: 0.4rem;
-    }
-
-    .pergunta {
-      font-weight: 600;
-      color: #ffe58a;
-    }
-
-    /* CABEÇALHO / MENU SUPERIOR */
-
-    header.site-header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: #050509ee;
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid #1e1e2e;
-    }
-
-    .nav-container {
-      max-width: 900px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 8px 12px;
-    }
-
-    nav.nav-links {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-    }
-
-    .nav-list {
-      display: flex;
-      gap: 8px;
-      padding: 0;
-      margin: 0;
-      list-style: none;
-    }
-
-    .nav-list li {
-      position: relative;
-    }
-
- .nav-btn {
-  display: inline-block;
-  padding: 6px 12px;
-  border-radius: 999px;
-  border: 1px solid #2b2b40;
-  font-size: 0.82rem;
-  text-decoration: none;
-  color: #d0d0ff;
-  background: #11111a;
-  white-space: nowrap;
-  cursor: pointer;
-  -webkit-appearance: none;
-  appearance: none;
-}
-    
-.nav-btn:focus-visible {
-  outline: none;
-  box-shadow: none;
-}
-
-    .nav-btn:hover {
-      border-color: #4b4b80;
-      background: #1a1a26;
-    }
-
-    .nav-btn-primary {
-      border-color: #6366f1;
-      background: #1d1f3a;
-      color: #ffffff;
-    }
-
-    /* DROPDOWN DE CAPÍTULOS (SÓ CSS) */
-
-    .dropdown {
-      position: relative;
-    }
-
-    .dropdown-menu {
-      position: absolute;
-      top: 110%;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #11111a;
-      border: 1px solid #2b2b40;
-      border-radius: 10px;
-      padding: 6px;
-      display: none;
-      min-width: 140px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-      z-index: 200;
-    }
-
-    .dropdown:hover .dropdown-menu {
-      display: block;
-    }
-
-    .dropdown-menu button {
-      width: 100%;
-      background: transparent;
-      border: none;
-      color: #e0e0ff;
-      font-size: 0.8rem;
-      text-align: left;
-      padding: 4px 8px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .dropdown-menu button:hover {
-      background: #1e1e2e;
-    }
-
-    /* TÍTULO GERAL ABAIXO DO MENU */
-
-    .global-title-wrapper {
-      max-width: 900px;
-      margin: 8px auto 0;
-      padding: 0 20px 4px;
-    }
-
-    .global-title {
-      font-size: 1rem;
-      font-weight: 600;
-      color: #f5f5ff;
-      text-align: center;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-    }
-
-    main {
-      padding-top: 8px;
-    }
-
-    /* PÁGINAS (SEÇÕES) */
-
-    .page-section {
-      display: none;
-    }
-
-    .page-section.active {
-      display: block;
-    }
-
-    button {
-  -webkit-tap-highlight-color: transparent;
-}
-
+    .dangerText{color:#ffd0d6}
+    .okText{color:#c8ffe9}
+    .warnText{color:#ffe9b8}
+    .copybar{display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:flex-end}
   </style>
 </head>
 
 <body>
-  <header class="site-header">
-    <div class="nav-container">
-      <nav class="nav-links">
-<ul class="nav-list">
-  <li>
-    <button id="btn-intro" class="nav-btn nav-btn-primary" type="button" onclick="showSection('intro')">
-      INTRODUÇÃO
-    </button>
-  </li>
+<div class="wrap">
 
-  <li class="dropdown">
-    <button id="btn-caps" class="nav-btn" type="button">
-      CAPÍTULOS ▾
-    </button>
-    <div class="dropdown-menu">
-      <button type="button" onclick="showSection('cap1')">Capítulo 1</button>
-      <button type="button" onclick="showSection('cap2')">Capítulo 2</button>
-      <button type="button" onclick="showSection('cap3')">Capítulo 3</button>
-      <button type="button" onclick="showSection('cap4')">Capítulo 4</button>
-      <button type="button" onclick="showSection('cap5')">Capítulo 5</button>
-      <button type="button" onclick="showSection('cap6')">Capítulo 6</button>
-      <button type="button" onclick="showSection('cap7')">Capítulo 7</button>
-      <button type="button" onclick="showSection('cap8')">Capítulo 8</button>
-      <button type="button" onclick="showSection('cap9')">Capítulo 9</button>
-    </div>
-  </li>
-
-  <li>
-    <button id="btn-testemunhos" class="nav-btn" type="button" onclick="showSection('testemunhos')">
-      TESTEMUNHOS
-    </button>
-  </li>
-</ul>
-      </nav>
-    </div>
-
-    <div class="global-title-wrapper">
-      <div class="global-title">
-        Revelações Bíblica
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo"></div>
+      <div>
+        <h1>LEV — Console Textual <span class="pill" id="pbVer">PB v1.7</span></h1>
+        <div class="sub">Site texto (MVP local). Login/DB/assinaturas reais exigem servidor.</div>
       </div>
     </div>
-  </header>
-
-  <main>
-    <div class="page">
-
-      <!-- ========== INTRODUÇÃO ========== -->
-<section id="intro" class="page-section active">
-  <div class="content-container">
-    <h1>Introdução</h1>
-
-    <h2>A Palavra</h2>
-
-    <p class="saudacao"><strong>Saúdo os amados irmãos com a paz do nosso Senhor e Salvador Jesus Cristo.</strong>
-    Poucos me conhecem e sabem quem eu sou. Mas digo que aqueles que dizem me conhecer já não me conhecem mais, pois hoje sou uma nova criatura, lavada e remida pelo sangue do Cordeiro. A sua misericórdia é grandiosa e dura para sempre.</p>
-
-    <p><strong>Eu me chamo Cássio Douglas</strong> (<em>rio negro e vazio</em>), nasci e cresci em um lar cristão. À medida que fui crescendo, via minha mãe frequentando o templo do Senhor, e lá me foi apresentada a Palavra. E, quanto mais eu a conhecia, mais me apaixonava por Ela, de tal maneira que a Palavra entrou em meu coração e lá fez morada.</p>
-
-    <p>Eu achava bom e amava a Palavra, pois Ela falava comigo o tempo todo, e eu falava com Ela.</p>
-
-    <p>Mas, com o tempo, comecei a observar e percebi algo que não estava certo: aqueles que falavam da Palavra não faziam o que Ela mandava. Então nasceu em mim uma dúvida — e com a dúvida veio um vazio.</p>
-
-    <p>Eu olhava para a direita, e o vazio estava lá; olhava para a esquerda, e o vazio estava lá; olhava para trás, e o vazio estava lá; olhava para frente, e o vazio estava lá, com os olhos fixos em mim.</p>
-
-    <p>Então eu disse:<br>
-    — O que está havendo? Por que estou sentindo esse vazio? Por acaso a Palavra não basta? Será que há algo que me falta e que eu ainda não conheço, algo que possa preencher esse vazio?</p>
-
-    <p>E continuei dizendo:<br>
-    — Com certeza eu não conheço o mundo por completo. Eu devo ir até o mundo e encontrar esse algo que está faltando para preencher esse vazio!</p>
-
-    <p class="destaque"><strong>Ah, que decisão horrível e insensata — uma decisão terrível que tomei.</strong> Fui então procurar no mundo algo que pudesse preencher esse vazio.</p>
-
-    <p>E eu dizia:<br>
-    — Acho que preciso me divertir, conhecer mais pessoas e fazer mais amigos, de diferentes tipos. Assim, talvez eu preencha o vazio, pois terei muitos amigos, e eles me confortarão.</p>
-
-  <p class="palavra">E a Palavra dizia:<br>
-    — Ei, espera! Não vá por aí... volta aqui!</p>
-
-    <p>E eu respondia à Palavra:<br>
-    — Espere! Eu só vou resolver esse vazio aqui, e então estarei completo, e logo voltarei a Ti novamente.</p>
-
-    <p>Então comecei a fazer amigos no mundo — e gostei. De repente me senti alegre, pois havia pessoas que me faziam sentir bem. Eles brincavam comigo e eu com eles; eles me escutavam e eu os escutava; eles me amavam e eu também os amava.</p>
-
-    <p>E foi assim por um bom tempo... Até não ser mais.</p>
-
-    <p>Logo a alegria se tornou amargura. As presenças se tornaram apenas corpos frios, incapazes de aquecer a alma. As brincadeiras perderam a graça. Eles já não tinham paciência para me ouvir, e eu não conseguia mais ouvi-los. O amor se quebrou como vidro e se espalhou em estilhaços pelo chão.</p>
-
-    <p>Então olhei para a esquerda, e o vazio ainda estava lá; olhei para a direita, e o vazio ainda estava lá; olhei para trás, e o vazio ainda estava lá; olhei para frente, e o vazio estava ali — me observando.</p>
-
-    <p>E eu disse:<br>
-    — O que está acontecendo? Por que esse vazio não foi preenchido? Será que não é a amizade que vai preenchê-lo? Será que existe algo melhor que possa fazê-lo? Preciso procurar mais... Devo ir e encontrar no mundo o que possa preencher esse vazio — e então, talvez, serei completo e feliz de uma vez.</p>
-
-    <p>Então me pus a procurar...</p>
-
-<p class="palavra">E a Palavra dizia:<br>
-    — Ei, espera! Não vá por aí... volta aqui!</p>
-
-    <p>E eu falava a Ela:<br>
-    — Espere! Eu só vou resolver esse vazio aqui, e então estarei completo e logo voltarei a Ti novamente.</p>
-
-    <p>E aconteceu que encontrei conforto nos jogos eletrônicos. Achei interessante e fiquei fascinado com aquilo, e dizia:<br>
-    — Que incrível! Existe um mundo dentro de outro mundo!</p>
-
-    <p>Então me pus a aprender cada vez mais, e quanto mais aprendia, mais maravilhado eu ficava — e me tornava bom naquilo em que me empenhava.</p>
-
-    <p>E eu dizia:<br>
-    — Eu sou bom nisso!<br>
-    — Vou me tornar o melhor entre os melhores, e serei reconhecido mundialmente! Assim, esse vazio será preenchido!</p>
-
-    <p>E assim eu fiz.</p>
-
-    <p>Mas, na metade do caminho, comecei a perceber que o interesse esfriava. O fascínio se tornou decepção, e o “mundo dentro do mundo” já não era tão incrível. Quanto mais eu aprendia, mais via que tudo era em vão — não havia sentido, e percebi que ser bom em algo tão viu, não era o que realmente importava.</p>
-
-    <p>Então olhei à esquerda, e o vazio ainda estava lá; olhei à direita, e o vazio ainda estava lá; olhei para trás, e o vazio ainda estava lá; olhei para frente, e o vazio continuava com os olhos fixos em mim.</p>
-
-    <p>Desesperado, eu dizia:<br>
-    — O que é isso? Por que essa coisa não sai de mim? Será que enlouqueci? Será que esse vazio vai me seguir pelo resto da vida? O que devo fazer?</p>
-
-    <p>Então me veio à mente que eu estava só, e percebi que todos ao meu redor tinham alguém. E pensei comigo mesmo:<br>
-    — Deve ser isso! Com certeza é isso! Esse vazio será preenchido quando eu encontrar alguém que eu ame de verdade — alguém que seja minha!</p>
-
-<p class="palavra">E a Palavra dizia:<br>
-    — Ei, espera! Não vá por aí... volta aqui!</p>
-
-    <p>Mas eu respondia à Palavra:<br>
-    — Espere! Eu só vou resolver esse vazio aqui, e então estarei completo, e logo voltarei a Ti novamente.</p>
-
-    <p>Então fui e procurei por todos os lados até encontrar alguém que eu amasse. E encontrei. E me apaixonei. Encantei-me com o amor de outra pessoa voltado para mim. Sentia-me feliz e alegre novamente, pois de alguma maneira aquele amor me fazia bem.</p>
-
-    <p>E por lá fiquei, por um bom tempo... até que a paixão esfriou, o encanto se quebrou e o que era amor se tornou dúvida. De repente, o amor que era só meu acabou. Por mais que eu tentasse reacender aquela chama, não conseguia.</p>
-
-    <p>E então caí. Veio a tristeza e o arrependimento, e eu dizia:<br>
-    — Como pude confiar tanto em alguém assim? Como fui tolo e ingênuo? Cuspiu no meu amor e o jogou fora, como um papel amassado sem valor.</p>
-
-    <p>Nasceu em mim o rancor e a tristeza. E olhei para a esquerda — o vazio ainda estava lá, só que maior. Olhei para a direita — o vazio ainda estava lá, só que maior. Olhei para trás e para frente — e o vazio me fitava e sorria para mim.</p>
-
-    <p>Então me veio o pavor.</p>
-
-    <p>E eu disse:<br>
-    — Já que é assim, farei o mesmo que fizeram comigo! Nunca mais amarei alguém. Vou focar apenas em mim. Não me importarei mais com os sentimentos alheios, nem com o estrago que eu causar por onde passar.</p>
-
-<p class="palavra">E a Palavra dizia:<br>
-    — Ei, espera! Não vá por aí... volta aqui!</p>
-
-    <p>Mas eu dizia à Palavra:<br>
-    — Não dá pra viver neste mundo do jeito que você me ensinou. Este mundo só quer me devorar! Então serei mais esperto e o devorarei primeiro!</p>
-
-    <p>E assim, o meu coração se petrificou, e a Palavra se tornou abafada, e não a escutava mais com clareza.</p>
-
-    <p>Fui e experimentei tudo o que há no mundo. Fiz coisas absurdas aos olhos do próprio Deus — coisas das quais me arrependo até hoje. Era como se eu me prostituísse com o mundo e pecasse contra Deus a cada passo que dava, de modo que os meus pecados subiam aos céus.</p>
-
-    <p>E eu dizia:<br>
-    — Agora sim! Agora estou fazendo todos pagarem pelo que fizeram a mim. Agora estão levando o que merecem! Fui humilhado — agora humilho. Fui rejeitado — agora rejeito. Fui esquecido — agora ignoro.</p>
-
-    <p>E, de maneira sórdida, isso me trazia prazer.</p>
-
-    <p>Mas o tempo passou, e percebi o estrago que causei. Vi quantas pessoas magoei, e de repente me deparei novamente com o vazio — mas, dessa vez, ele não estava à minha direita, nem à esquerda, nem atrás, nem à frente. <strong>Eu estava dentro dele. Mergulhado no vazio.</strong></p>
-
-    <p>E eu disse:<br>
-    — Que sentimento ruim! Que sensação podre! Como pude me perder assim? O que devo fazer agora? Já procurei em tudo, e nada preencheu esse vazio. Muito pelo contrário — agora estou afundado nele. Quanto mais me movo, mais me afundo, como quem tenta escapar da lama do deserto.</p>
-
-    <p>E eu clamava:<br>
-    — O que devo fazer, Senhor?</p>
-
-    <p>Então, um ponto de luz surgiu na minha vida: <strong>minha filha nasceu</strong> e por ser uma luz em minha vida a chamei de <strong>Kiara</strong> (<em>luz</em>).</p>
-
-    <p>E eu disse:<br>
-    — Que bênção! Que coisa maravilhosa! Agora sim essa lama nojenta vai sair de mim. Vou dedicar-me completamente à minha filha e ensiná-la para que nunca passe o que eu passei. Assim o vazio vai desaparecer e viverei feliz ao lado dela.</p>
-
-    <p>E assim o fiz, até os dias de hoje.</p>
-
-    <p>Mas a Palavra ainda falava — eu é que não a ouvia, pois a pedra no meu coração sufocava sua voz.</p>
-
-    <p>Na medida em que eu ia criando minha filha, lembrava-me da minha própria criação e percebia o quanto deve ter sido difícil para minha mãe. Ela teve nove filhos e, mesmo com todas as dificuldades e lutas, trouxe todos até a vida adulta.</p>
-
-    <p>E eu, com apenas uma filha, ganhando mais do que ela um dia sonhou ganhar, sentia o peso de uma responsabilidade imensa. Pensava comigo que, ainda assim, o que eu ganhava era pouco para dar à minha filha o que ela merecia.</p>
-
-    <p>Então atentei meus olhos à minha mãe e comecei a observá-la de perto, em silêncio, pois o meu pai não podia ser o exemplo de homem que eu deveria seguir.</p>
-
-    <p>E eu disse:<br>
-    — Preciso ganhar o máximo de dinheiro que puder, para dar um futuro digno à minha filha. Assim me sentirei realizado, e essa lama nojenta sairá de mim.</p>
-
-    <p>E assim o fiz. O tempo passou, minha filha cresceu, e percebi que o que eu havia feito era bom.</p>
-
-    <p>Mas, à medida que o tempo passava, eu continuava observando minha mãe. Eu me comparava a ela. E percebia algo que antes não via: mesmo ganhando tão pouco, ela tinha tudo o que precisava. E, com tão pouco, ainda dava graças a Deus.</p>
-
-    <p>Lembrei-me de cada conselho que ela me deu, e comecei a aplicá-los em minha vida, pois queria que minha filha se tornasse uma mulher assim também — grata, temente a Deus, perseverante.</p>
-
-    <p>Mas, à medida que ela foi crescendo, veio o afastamento, a distância. Percebi o duro ciclo da vida. E me veio à mente, com clareza, que eu havia feito o mesmo com minha mãe.</p>
-
-    <p>Veio então a tristeza e a amargura. Olhei para o vazio, e percebi que não estava mais apenas mergulhado nele — <strong>eu mesmo havia me tornado o vazio.</strong></p>
-
-    <p>E eu dizia:<br>
-    — Não faz mais sentido viver. Fiz tudo o que podia para me livrar desse vazio, e tudo o que fiz só me afundou ainda mais.</p>
-
-    <p>Pensei comigo:<br>
-    — Devo continuar focando no meu crescimento financeiro, porque assim terei tudo o que quiser e viverei bem. Não ligarei mais para esse vazio, pois ele sempre esteve aqui — não há nada que eu possa fazer para preenchê-lo.</p>
-
-    <p>E a Palavra dizia algo... mas eu não entendia, pois a pedra em meu coração ainda a sufocava.</p>
-
-    <p>Então eu disse:<br>
-    — Estou me sentindo só. Preciso ter uma companheira. Mas não aceitarei qualquer uma. Já que todas as escolhas que fiz foram erradas, escolherei uma que se pareça com minha mãe, pois assim saberei que será uma boa esposa e saberá cuidar dos meus filhos.</p>
-
-    <p>Comecei a observar ainda mais minha mãe e vi o quanto ela era boa comigo. O quanto sua fé e perseverança eram grandes. Percebi que Deus nunca a abandonou, sempre esteve ao seu lado, pois ela ouvia a Palavra, falava com Ela e fazia tudo o que Ela mandava.</p>
-
-    <p>Então, uma parte da pedra que havia em meu coração se quebrou, e a voz da Palavra começou a ficar um pouco menos ofuscada.</p>
-
-    <p>Depois de muita procura, encontrei uma companheira que me agradava — uma mulher segundo o exemplo da minha mãe. Vi nela as mesmas virtudes e a mesma doçura, e com ela estou até hoje.</p>
-
-    <p>Mas, mesmo assim, eu ainda era o vazio. E ela não podia fazer nada para preenchê-lo.</p>
-
-    <p>Vendo que eu estava perdido, e também sentindo o mesmo vazio dentro dela, ela me disse:<br>
-    — Vamos à igreja?</p>
-
-    <p>E eu, incrédulo, ri e respondi:<br>
-    — Não seria uma má idéia.</p>
-
-    <p>Então viemos pela primeira vez à <strong>Igreja Shalon</strong>. E senti uma presença que há muito tempo eu não sentia. Algo diferente. Algo que se fazia presente em cada coração que estava ali naquele momento.</p>
-
-    <p>E eu disse:<br>
-    — Esse lugar é diferente!</p>
-
-    <p>E outra parte da pedra em meu coração se quebrou. A voz da Palavra começou a soar mais clara.</p>
-
-    <p>Sem relutar, disse à minha esposa:<br>
-    — Vamos novamente na próxima semana, sem demora. Pois aqui é diferente!</p>
-
-    <p>E assim o fizemos.</p>
-
-    <p>Na segunda vez, senti novamente a presença de Deus. À medida que o culto avançava, a pedra do meu coração ia se quebrando. E quanto mais a Palavra era ministrada, mais a luz do Espírito iluminava aquilo que antes era escuridão.</p>
-
-    <p>E então, durante a ministração, todas as pedras se quebraram de vez.</p>
-
-    <p>E ouvi a voz da Palavra dizer:<br>
-    — Ei! Volta aqui!</p>
-
-    <p>E me pus a chorar. Chorava porque percebi que, mesmo depois de tanto tempo e de tudo o que fiz, Ela ainda estava lá, me chamando pelo nome.</p>
-
-    <p>Chorei e chorei, arrependido, e fui até o encontro dela. A aceitei novamente em meu coração e comecei a escutá-la — e falar com Ela.</p>
-
-    <p>Lembrei-me da minha mãe, do quanto ela orou por mim, do tamanho da sua fé, da paciência, da perseverança... e me senti pequeno diante dela. Vi o quanto era grande e querida por Deus.</p>
-
-    <p>Após a terceira vez na Shalon, cresceu em mim um desejo intenso de buscar mais da Palavra. Eu sabia como fazer, pois há muito tempo Ela já morava em meu coração.</p>
-
-    <p>Então jejuei, orei e meditei na Palavra durante três dias e três noites. Busquei, me humilhei e me arrependi de todos os meus pecados. Neguei o mundo e a mim mesmo. Não tocava no celular, não olhava no espelho, nem sequer ousava olhar para o céu — pois sabia que ali estava Deus, e eu não era digno de contemplar Sua grandeza.</p>
-
-    <p>E pedi a Ele o batismo com o Espírito Santo, pois eu lia a Palavra, mas não a compreendia. Queria ser íntimo da Palavra.</p>
-
-    <p><strong>E então, na madrugada do terceiro dia, o Espírito Santo de Deus veio sobre mim e preencheu o grande vazio que havia em mim.</strong></p>
-
-    <p>E me pus a chorar, dizendo:<br>
-    — Eu não sou digno...</p>
-
-    <p>Mas Ele, cheio de misericórdia, me visitou. E me foram reveladas grandes coisas. Vi que era cego e não enxergava. Que vivia, mas estava morto. Mas agora, vivo estou e vejo.</p>
-
-    <p>Corri para contar à minha esposa, chorando em prantos — mas ela ainda dormia e não compreendeu o que havia acontecido.</p>
-
-    <p>Então me veio à mente uma pessoa que entenderia o que eu sentia naquele momento: <strong>minha mãe</strong>.</p>
-
-    <p>Corri até sua casa e gritei:<br>
-    — Mãe! Ô mãe, abre aqui!</p>
-
-    <p>Ela, que acorda cedo para o culto doméstico, veio abrir o portão. E eu contei tudo, dizendo que havia sido batizado com o Espírito Santo.</p>
-
-    <p>Abracei-a e chorei um choro inconsolável, como se não a visse há muito tempo. E dizia:<br>
-    — Mãe, Deus é maravilhoso! Mãe, Ele é tão misericordioso!</p>
-
-    <p>E chorava... Um choro de libertação, de gratidão, de renascimento.</p>
-
-    <p><strong>Pois eu não era mais vazio — tudo fazia sentido.</strong> Lembrei-me de tudo o que me aconteceu, arrependi-me de tudo o que fiz, e hoje sou uma nova criatura, não mais escravo do mundo, mas servo do Deus vivo, Jesus Cristo.</p>
-
-    <hr>
-
-    <p><strong>Introdução à revelação deste livro</strong></p>
-
-    <p>Depois desse encontro real com o Espírito Santo, <strong>o Senhor começou a me revelar coisas profundas sobre o Reino de Deus, sobre a vinda de Jesus, sobre os tempos proféticos e sobre a guerra espiritual que está por trás da história humana</strong>. Não são ideias minhas, nem estudos frios, mas revelações que o Espírito me deu à medida que eu buscava na Palavra, em oração, jejum e obediência.</p>
-
-    <p>Este livro não é para curiosos, nem para quem quer “apenas aprender mais um pouco”. <strong>Ele é para aqueles que já foram marcados por Deus, que têm o sinete do Senhor, que sentem que algo está errado com o mundo e com o sistema religioso, e que o Espírito dentro deles clama por verdade.</strong></p>
-
-    <p>O que você vai ler nos próximos capítulos é fruto desse processo: <strong>um chamado do Espírito Santo aos escolhidos</strong>, para que entendam:</p>
-
-    <p class="destaque">• o que é de fato o Reino de Deus;<br>
-    • como funciona o tribunal vivo que é esta vida;<br>
-    • o que significa a vinda de Jesus de forma individual em nossa morte;<br>
-    • como o sistema do mundo se tornou a própria imagem da besta;<br>
-    • e qual é o papel dos santos nestes últimos tempos.</p>
-
-    <p class="resumo-final"><strong>Se você está lendo isto e algo dentro de você arde, é porque essa mensagem é para você.</strong> Que o mesmo Espírito que me convenceu, me quebrou e me levantou, também fale com você enquanto avança nos próximos capítulos.</p>
-
-  </div>
-</section>
-
-      <!-- ========== CAPÍTULO 1 ========== -->
-      <!-- ========== CAPÍTULO 1 ========== -->
-      <section id="cap1" class="page-section">
-        <div class="tag-capitulo">Capítulo 1</div>
-        <h1>O Reino de Deus, Sua Manifestação e a Vinda de Jesus</h1>
-        <p class="subtitulo">
-          Entendendo o Reino que é interior, o dia em que Ele se manifesta em vida
-          e a vinda de Jesus na morte de cada pessoa.
-        </p>
-
-        <section>
-          <!-- INTRODUÇÃO DO CAPÍTULO 1 -->
-          <p class="saudacao">
-            Que a paz do nosso Senhor e Salvador Jesus Cristo esteja sobre você.
-            Se você está lendo estas palavras, não é por acaso — é porque o Espírito Santo
-            tocou o seu coração e te trouxe até aqui. Este capítulo não é para curiosos,
-            nem para religiosos; é para os escolhidos, para aqueles que o Pai marcou com
-            Seu sinete e que ouviram, mesmo que de longe, a voz do Senhor dizendo:
-            <span class="destaque">“Volta aqui.”</span>
-          </p>
-
-          <p>
-            Neste capítulo quero te preparar para algo que poucos entendem:
-            <span class="destaque">o que é o Reino de Deus, quando Ele se manifesta
-            e quando Jesus vem a cada pessoa.</span> Jesus ensinou que o Reino não é
-            um lugar visível, nem algo que se aponta com o dedo; é um governo espiritual
-            que começa dentro do homem quando ele se rende ao Rei. O Reino não aparece
-            nos olhos, mas transforma a vida por dentro. Ele não chega depois da morte —
-            <strong>Ele chega quando o Espírito Santo abre os seus olhos
-            e você reconhece Jesus como o Cristo.</strong>
-          </p>
-
-          <p>
-            Jesus também ensinou que Sua vinda não será um evento público, nem espetáculo
-            no céu, nem algo que o mundo verá ao mesmo tempo. Ele disse que Sua vinda é
-            como um relâmpago: rápida, invisível e inevitável. E afirmou que nem os anjos,
-            nem o Filho sabem o dia — somente o Pai. A única realidade que ninguém conhece,
-            que acontece como um relâmpago e diante da qual todo ser humano passa,
-            é a morte. <span class="destaque">É ali, no último instante da vida,
-            que o Filho do Homem vem para cada pessoa, individualmente, para julgar
-            e separar luz e trevas.</span>
-          </p>
-
-          <p class="resumo-final">
-            Estas verdades estão na Palavra, mas só quem nasceu do Espírito pode enxergar.
-            <strong>Aqui você começará a ver. Aqui você entenderá.</strong>
-            Este capítulo é apenas a porta — e quem entrou, entrou porque
-            foi chamado pelo Rei.
-          </p>
-
-          <!-- ===================================================== -->
-          <!-- 1.1 — O QUE É O REINO DE DEUS? -->
-          <!-- ===================================================== -->
-
-          <h2>1.1 — O QUE É O REINO DE DEUS?</h2>
-
-          <p>
-            Este capítulo não é para curiosos, nem para religiosos…
-            <span class="destaque">é para os escolhidos, aqueles que têm o sinete de Deus
-            e que ouviram, mesmo que fraco, o toque da voz do Mestre dizendo:
-            “Volta aqui.”</span>
-          </p>
-
-          <p>
-            Hoje vamos falar daquilo que Jesus mais pregou na Terra:
-            <strong>O Reino de Deus.</strong>
-          </p>
-
-          <p class="pergunta">
-            Se eu te perguntasse agora — onde está o Reino de Deus? O que você responderia?
-          </p>
-
-          <p>
-            A maioria diria:
-          </p>
-          <ul>
-            <li>“É no céu.”</li>
-            <li>“É onde Deus mora.”</li>
-            <li>“É um lugar santo onde vamos depois da morte.”</li>
-          </ul>
-
-          <p>
-            Mas Jesus — o próprio Rei — disse algo completamente diferente.
-          </p>
-
-          <h3>O que Jesus disse sobre o Reino</h3>
-
-          <div class="verso">
-            <p>
-              “Os fariseus perguntaram a Jesus quando seria que o Reino de Deus ia chegar.
-              Ele respondeu: — Quando vocês virem o Reino de Deus chegar, não vão poder dizer:
-              ‘Ele está aqui’ ou ‘Ele está ali’, pois <strong>o Reino de Deus está dentro
-              de vocês</strong>.”
-            </p>
-            <small>Lucas 17:20–21 — NTLH</small>
-          </div>
-
-          <p>
-            Ou seja:
-          </p>
-          <ul>
-            <li>não é um país,</li>
-            <li>não é um templo,</li>
-            <li>não é uma geografia física,</li>
-            <li>não é um lugar que você vê com os olhos.</li>
-          </ul>
-
-          <p>
-            <strong>O Reino é interior.</strong><br>
-            <strong>É espiritual.</strong><br>
-            E só pode ser visto pelos que nasceram do Espírito.
-          </p>
-
-          <div class="verso">
-            <p>
-              “Jesus respondeu: — Eu afirmo a você que isto é verdade:
-              <strong>ninguém pode ver o Reino de Deus se não nascer de novo.</strong>”
-            </p>
-            <small>João 3:3 — NTLH</small>
-          </div>
-
-          <p>
-            Quem nasce só da carne vive preso ao mundo.
-            <span class="destaque">Quem nasce do Espírito enxerga o que os outros não veem.</span>
-          </p>
-
-          <h3>O Reino de Deus é a presença do Rei dentro do homem</h3>
-
-          <p>
-            Aqui está o mistério que poucos entendem:
-            <span class="destaque">O Reino não é apenas um lugar — é o governo de Deus
-            dentro do homem.</span>
-          </p>
-
-          <p>
-            É o trono de Jesus estabelecido dentro de você.  
-            É a vida de Cristo reinando sobre seus desejos, pensamentos e decisões.
-          </p>
-
-          <p>
-            Por isso o Reino não começa quando morremos…
-            <strong>o Reino começa quando nos rendemos.</strong>
-          </p>
-
-          <div class="verso">
-            <p>
-              “E Jesus dizia a todos: — Se alguém quer ser meu seguidor,
-              <strong>esqueça os seus próprios interesses, esteja pronto
-              cada dia para morrer como Eu vou morrer e me acompanhe.</strong>”
-            </p>
-            <small>Lucas 9:23 — NTLH</small>
-          </div>
-
-          <p>
-            Ele estava mostrando a porta de entrada do Reino.
-          </p>
-
-          <p class="pergunta">
-            Você quer saber quem está no Reino?
-          </p>
-
-          <ul>
-            <li><span class="destaque">Aquele que obedece ao Rei.</span></li>
-            <li><span class="destaque">Aquele que se arrepende de verdade.</span></li>
-            <li><span class="destaque">Aquele que renuncia ao mundo.</span></li>
-            <li><span class="destaque">Aquele que deixa a Palavra governar sua vida.</span></li>
-          </ul>
-
-          <p>
-            Não é religião.  
-            Não é placa de igreja.  
-            Não é tradição.
-          </p>
-
-          <p class="destaque">
-            É governo. É domínio. É autoridade de Cristo dentro de você.
-          </p>
-
-          <h3>O Reino é invisível aos olhos, mas palpável na vida</h3>
-
-          <p>
-            Você já percebeu que Jesus nunca disse “vai para o Reino”?  
-            Ele sempre disse:
-          </p>
-
-          <ul>
-            <li>“O Reino chegou.”</li>
-            <li>“O Reino está próximo.”</li>
-            <li>“O Reino está entre vós.”</li>
-          </ul>
-
-          <p>
-            Sabe por quê?  
-            Porque quando Cristo entra na vida de uma pessoa,
-            <span class="destaque">o Reino desce junto.</span>
-          </p>
-
-          <p>
-            Seu Espírito governa.  
-            Sua vontade prevalece.  
-            Sua luz expulsa as trevas que habitavam naquele coração.
-          </p>
-
-          <p>
-            Por isso:
-          </p>
-
-          <ul>
-            <li>O Reino de Deus é a vida de Jesus reinando dentro do homem.</li>
-            <li>É o governo do Céu dentro de pessoas na Terra.</li>
-            <li>É a presença do Rei estabelecendo um novo modo de viver.</li>
-          </ul>
-
-          <h3>O Reino é o oposto do sistema do mundo</h3>
-
-          <p>
-            O mundo cobra.  
-            O Reino transforma.
-          </p>
-          <p>
-            O mundo exige.  
-            O Reino liberta.
-          </p>
-          <p>
-            O mundo quer aparência.  
-            O Reino quer verdade.
-          </p>
-          <p>
-            O mundo é trevas.  
-            O Reino é luz.
-          </p>
-
-          <div class="verso">
-            <p>
-              “Jesus respondeu: — <strong>O meu Reino não é deste mundo.</strong>
-              Se o meu Reino fosse deste mundo, os meus seguidores lutariam
-              para Eu não ser entregue aos líderes judeus. Mas o meu Reino
-              não é daqui.”
-            </p>
-            <small>João 18:36 — NTLH</small>
-          </div>
-
-          <div class="verso">
-            <p>
-              “Pois o Reino de Deus <strong>não é comida nem bebida</strong>,
-              mas <strong>justiça, paz e alegria</strong> que o Espírito Santo dá.”
-            </p>
-            <small>Romanos 14:17 — NTLH</small>
-          </div>
-
-          <p>
-            Ou seja:
-            <span class="destaque">
-              O Reino não está nas coisas… está nas pessoas transformadas pelo Espírito.
-            </span>
-          </p>
-
-          <!-- ===================================================== -->
-          <!-- 1.2 — QUANDO É A MANIFESTAÇÃO DO REINO DE DEUS? -->
-          <!-- ===================================================== -->
-
-          <h2>1.2 — Quando é a Manifestação do Reino de Deus?</h2>
-
-          <p>
-            Agora que já entendemos o que é o Reino de Deus, precisamos responder
-            uma segunda pergunta:
-            <span class="pergunta">Quando esse Reino se manifesta?</span>
-          </p>
-
-          <p>
-            Jesus mesmo responde em <strong>Lucas 17:25–30</strong>.
-          </p>
-
-          <div class="verso">
-            <p>
-              “Mas primeiro o Filho do Homem precisa <strong>sofrer muito</strong>
-              e ser <strong>rejeitado</strong> por esta gente.”
-            </p>
-            <small>Lucas 17:25 — NTLH</small>
-          </div>
-
-          <p>
-            Ou seja:
-          </p>
-          <ul>
-            <li>Somente após Sua morte o Reino de Deus poderia ser dado aos homens.</li>
-            <li>Porque somente após Sua morte Ele enviaria o Espírito Santo.</li>
-            <li>E é o Espírito Santo quem manifesta o Reino dentro de nós.</li>
-          </ul>
-
-          <p>
-            <span class="destaque">
-              A manifestação do Reino é espiritual, interior e acontece em vida,
-            </span> quando:
-          </p>
-
-          <ul>
-            <li>o Espírito Santo convence o homem do pecado,</li>
-            <li>ilumina os olhos,</li>
-            <li>desperta o espírito,</li>
-            <li>e faz a pessoa reconhecer que Jesus é o Cristo.</li>
-          </ul>
-
-          <p>
-            Isso é o que a Bíblia chama de
-            <span class="destaque">o dia da manifestação do Filho do Homem.</span><br>
-            Não é um evento público, não é algo visível, não é fogo caindo do céu.
-            <strong>É um despertar interior profundo.</strong>
-          </p>
-
-          <h3>A geração de Jesus não reconheceu a manifestação</h3>
-
-          <p>
-            Quando Jesus veio em carne, a maioria não o reconheceu como Messias.
-            Eles tinham olhos, mas não viam; tinham ouvidos, mas não ouviam.
-          </p>
-
-          <p>
-            Da mesma forma…
-          </p>
-          <ul>
-            <li>Hoje muitos leem a Bíblia — e não entendem.</li>
-            <li>Hoje muitos falam de Jesus — mas não o conhecem.</li>
-            <li>Hoje muitos frequentam igrejas — mas o Reino nunca se manifestou dentro deles.</li>
-          </ul>
-
-          <div class="verso">
-            <p>
-              “O Reino de Deus não vem de modo visível… porque o Reino está
-              <strong>dentro de vocês</strong>.”
-            </p>
-            <small>Lucas 17:20–21 — resumo NTLH</small>
-          </div>
-
-          <p>
-            A manifestação é interna, espiritual, real, visível apenas para quem recebe.
-          </p>
-
-          <h3>Noé — símbolo do discernimento espiritual</h3>
-
-          <div class="verso">
-            <p>
-              “Como aconteceu nos dias de Noé, assim será também nos dias do Filho do Homem… 
-              As pessoas comiam, bebiam, casavam e se davam em casamento, até o dia em que Noé
-              entrou na arca. Então veio o dilúvio e destruiu todos.”
-            </p>
-            <small>Lucas 17:26–27 — NTLH (parafraseado)</small>
-          </div>
-
-          <p>
-            Não é sobre morte ainda.  
-            <strong>É sobre discernimento.</strong>
-          </p>
-
-          <p>
-            Noé discerniu a voz de Deus.  
-            A geração dele — não discerniu.
-          </p>
-
-          <p>
-            Da mesma forma:
-          </p>
-          <ul>
-            <li>Quem tem o Espírito Santo reconhece o Reino.</li>
-            <li>Quem não tem, segue a vida normalmente, sem perceber nada.</li>
-          </ul>
-
-          <p class="destaque">
-            A manifestação do Reino separa:
-          </p>
-          <ul>
-            <li>os que discernem</li>
-            <li>dos que não discernem.</li>
-          </ul>
-
-          <p>
-            É o início do mover do Espírito na vida da pessoa.
-          </p>
-
-          <h3>Ló — símbolo da resposta imediata ao chamado</h3>
-
-          <div class="verso">
-            <p>
-              “E aconteceu a mesma coisa nos tempos de Ló; as pessoas comiam e bebiam,
-              compravam, vendiam, plantavam e construíam. Mas, no dia em que Ló saiu de Sodoma,
-              choveu fogo e enxofre do céu e todos morreram. O mesmo acontecerá no dia em que
-              o Filho do Homem aparecer.”
-            </p>
-            <small>Lucas 17:28–30 — NTLH</small>
-          </div>
-
-          <p>
-            Ló representa:
-          </p>
-          <ul>
-            <li>urgência espiritual,</li>
-            <li>prontidão,</li>
-            <li>resposta imediata,</li>
-            <li>obediência ao chamado.</li>
-          </ul>
-
-          <p>
-            Porque quando o Reino se manifesta dentro da pessoa, ela não hesita.
-            Ela sente o peso da verdade. Ela atende imediatamente à voz do Espírito Santo.
-          </p>
-
-          <div class="verso">
-            <p>
-              “Quando aquele dia chegar, quem estiver no terraço não desça para pegar as coisas
-              que estão em casa; e quem estiver no campo não volte para casa.”
-            </p>
-            <small>Lucas 17:31 — NTLH</small>
-          </div>
-
-          <p>
-            Isso não é morte ainda — é vida.  
-            Jesus está dizendo:
-          </p>
-
-          <ul>
-            <li>Quando o Espírito Santo te chamar, você não pode voltar para trás.</li>
-            <li>Quando a verdade se manifestar, você não pode resistir.</li>
-            <li>Quando o Reino despertar dentro de você, você precisa ir imediatamente.</li>
-          </ul>
-
-          <p class="destaque">
-            A manifestação do Reino é uma ruptura com o passado.
-          </p>
-
-          <h3>A Manifestação do Reino é o Despertar Espiritual</h3>
-
-          <p>
-            Portanto, segundo Jesus:
-          </p>
-          <ul>
-            <li>A manifestação do Reino acontece em vida.</li>
-            <li>Acontece quando o Espírito Santo abre os olhos.</li>
-            <li>Acontece quando a pessoa reconhece Jesus como Messias.</li>
-            <li>Acontece quando o Reino nasce dentro do coração.</li>
-            <li>Acontece no “dia da visitação” do Espírito Santo.</li>
-          </ul>
-
-          <p class="resumo-final">
-            <strong>Esse é o dia do Filho do Homem — em vida.</strong>
-          </p>
-
-          <!-- ===================================================== -->
-          <!-- 1.3 — QUANDO SERÁ A VINDA DE JESUS CRISTO? -->
-          <!-- ===================================================== -->
-
-          <h2>1.3 — Quando será a vinda de Jesus Cristo?</h2>
-          <p class="nota">
-            (A vinda individual, invisível e inevitável que acontece na morte de cada pessoa)
-          </p>
-
-          <p class="saudacao">
-            Que a paz do nosso Senhor e Salvador Jesus Cristo esteja sobre você,
-            meu irmão e minha irmã escolhidos pelo Pai. Se você chegou até aqui,
-            é porque o Espírito Santo já começou a abrir seus olhos — e agora vamos
-            a uma das verdades mais mal compreendidas em toda a Escritura:
-            <span class="pergunta">Quando Jesus vem?</span>
-          </p>
-
-          <p>
-            A resposta está nas palavras do próprio Senhor em
-            <strong>Lucas 17</strong>.
-          </p>
-
-          <h3>A vinda de Jesus é invisível, individual e inevitável</h3>
-
-          <div class="verso">
-            <p>
-              “E vos dirão: ‘Ele está aqui!’ ou ‘Ele está ali!’
-              <strong>Não vão atrás dessas pessoas, nem as sigam.</strong>”
-            </p>
-            <small>Lucas 17:23 — NTLH</small>
-          </div>
-
-          <p>
-            Se Jesus já avisou para não seguir quem diz que Ele está “ali ou aqui”, é porque:
-          </p>
-          <ul>
-            <li>Sua vinda não é um acontecimento geográfico.</li>
-            <li>Sua vinda não é coletiva.</li>
-            <li>Sua vinda não acontece no mundo físico como um show para todos verem.</li>
-          </ul>
-
-          <div class="verso">
-            <p>
-              “Pois, assim como o relâmpago brilha de uma ponta a outra do céu
-              e ilumina o céu inteiro, assim será o Filho do Homem no seu dia.”
-            </p>
-            <small>Lucas 17:24 — NTLH</small>
-          </div>
-
-          <p>
-            O relâmpago não pode ser acompanhado.  
-            Ele só deixa um flash.  
-            Tão rápido que ninguém consegue ver o percurso.
-          </p>
-
-          <p class="pergunta">
-            E qual é o único evento na vida humana que acontece:
-          </p>
-          <ul>
-            <li>rápido como um relâmpago,</li>
-            <li>visível somente por um instante,</li>
-            <li>impossível de prever,</li>
-            <li>impossível de repetir,</li>
-            <li>impossível de acompanhar,</li>
-            <li>e diante do qual “todo olho vê”?</li>
-          </ul>
-
-          <p class="destaque">
-            A morte.
-          </p>
-
-          <h3>A morte é o dia da vinda de Jesus para cada pessoa</h3>
-
-          <div class="verso">
-            <p>
-              “Os discípulos perguntaram: — Senhor, onde vai acontecer isso tudo?
-              Ele respondeu: — <strong>Onde estiver o corpo, ali se ajuntarão os abutres.</strong>”
-            </p>
-            <small>Lucas 17:37 — NTLH</small>
-          </div>
-
-          <p>
-            Ou seja:
-            <span class="destaque">
-              a vinda acontece no momento em que há um corpo morto.
-            </span><br>
-            No momento em que a pessoa deixa a vida terrena.  
-            No momento em que cai o “relâmpago”.
-          </p>
-
-          <div class="verso">
-            <p>
-              “Naquela noite, duas pessoas estarão dormindo na mesma cama:
-              <strong>uma será levada, e a outra será deixada.</strong>”
-            </p>
-            <small>Lucas 17:34 — NTLH</small>
-          </div>
-
-          <p>
-            Isso acontece diariamente na terra:
-          </p>
-          <ul>
-            <li>um morre, outro continua vivendo,</li>
-            <li>um é levado para Cristo,</li>
-            <li>outro permanece.</li>
-          </ul>
-
-          <p>
-            <strong>Isso é exatamente o que Jesus está explicando.</strong>
-          </p>
-
-          <h3>A prova máxima: “Nem o Filho sabe o dia”</h3>
-
-          <div class="verso">
-            <p>
-              “Mas ninguém sabe nem o dia nem a hora em que tudo isso vai acontecer,
-              nem os anjos do céu, nem o Filho; <strong>somente o Pai sabe.</strong>”
-            </p>
-            <small>Mateus 24:36 — NTLH</small>
-          </div>
-
-          <p>
-            Agora pense:
-          </p>
-          <ul>
-            <li>Se fosse um grande evento global…</li>
-            <li>Se fosse um dia específico no calendário…</li>
-            <li>Se fosse um acontecimento público para toda a humanidade…</li>
-          </ul>
-
-          <p>
-            Jesus saberia.  
-            Os anjos saberiam.  
-            Porque tudo já estaria programado desde o princípio.
-          </p>
-
-          <p class="destaque">
-            A única realidade que:
-          </p>
-          <ul>
-            <li>nenhum anjo sabe,</li>
-            <li>nenhum homem sabe,</li>
-            <li>nem o próprio Filho revelou saber,</li>
-            <li>e SOMENTE o Pai conhece…</li>
-          </ul>
-
-          <p class="destaque">
-            é o dia da morte de cada pessoa individualmente.
-          </p>
-
-          <p>
-            Porque só o Pai determina:
-          </p>
-          <ul>
-            <li>o dia do nascimento,</li>
-            <li>e o dia da morte.</li>
-          </ul>
-
-          <p>
-            Nenhum ser criado tem acesso a isso.
-          </p>
-
-          <h3>A vinda de Jesus acontece desde o Antigo Testamento</h3>
-
-          <p>
-            Jesus afirma algo muito profundo:  
-            <span class="destaque">
-              Ele não começou a “vir” depois da cruz — Ele sempre veio.
-            </span>
-          </p>
-
-          <p>
-            No mesmo capítulo, Ele cita:
-          </p>
-          <ul>
-            <li><strong>Os dias de Noé</strong> — um grupo foi levado pelo juízo (morte), outro permaneceu vivo.</li>
-            <li><strong>Os dias de Ló</strong> — um grupo foi levado (morte), outro permaneceu.</li>
-          </ul>
-
-          <p>
-            Jesus está dizendo:
-            <span class="destaque">
-              “O que aconteceu ali, acontece agora, e acontecerá até o fim.”
-            </span>
-          </p>
-
-          <p>
-            Ou seja:  
-            Ele sempre julgou cada geração individualmente, na morte,  
-            e não somente no final de todas as eras.
-          </p>
-
-          <h3>A verdade profunda: a vinda acontece nas TRÊS ERAS</h3>
-
-          <p>
-            Meu irmão(ã), se observamos com atenção as falas de Jesus, podemos perceber
-            que Ele faz isso desde o início do mundo, nas três eras bíblicas,
-            a qual irei falar para você mais para frente.
-          </p>
-
-          <p>
-            Jesus repete três vezes a mesma estrutura:
-          </p>
-          <ul>
-            <li>um vai, outro fica;</li>
-            <li>um é levado, outro permanece;</li>
-            <li>um é separado, outro fica para trás.</li>
-          </ul>
-
-          <p>
-            Isso aponta para:
-          </p>
-          <ul>
-            <li>os três tempos das trevas,</li>
-            <li>Israel na Lei,</li>
-            <li>os discípulos na Graça,</li>
-            <li>a Igreja remanescente nos últimos dias.</li>
-          </ul>
-
-          <p>
-            Em cada uma dessas eras:
-          </p>
-          <ul>
-            <li>Jesus veio para Seus escolhidos,</li>
-            <li>julgou os ímpios na morte,</li>
-            <li>separando luz e trevas um a um.</li>
-          </ul>
-
-          <div class="verso">
-            <p>
-              “Meu Pai trabalha até agora, e Eu também trabalho.”
-            </p>
-            <small>João 5:17 — NTLH</small>
-          </div>
-
-          <p>
-            Ele vem constantemente.  
-            <strong>Para cada vida. Para cada geração.</strong>
-          </p>
-
-          <h3>Portanto… Quando Jesus vem?</h3>
-
-          <ul>
-            <li>Ele vem no momento da morte de cada pessoa.</li>
-            <li>Ele vem como relâmpago — rápido, invisível, inevitável.</li>
-            <li>Ele vem para julgar — imediatamente.</li>
-            <li>Ele vem para levar o justo e deixar o ímpio.</li>
-            <li>Ele vem desde o Antigo Testamento até hoje.</li>
-            <li>Ele virá assim até o fim desta última era.</li>
-          </ul>
-
-          <p class="destaque">
-            Não existe “evento global” de arrebatamento físico,
-            nem Jesus aparecendo publicamente a todos os homens ao mesmo tempo
-            como um show na terra.
-          </p>
-
-          <p>
-            A Bíblia inteira confirma:
-          </p>
-          <ul>
-            <li>A vinda é espiritual.</li>
-            <li>É individual.</li>
-            <li>É invisível.</li>
-            <li>É no momento da morte.</li>
-            <li>É o encontro da alma com o Filho do Homem.</li>
-          </ul>
-
-          <div class="resumo-final">
-            <h2>Resumo do Capítulo 1</h2>
-
-            <ul>
-              <li>O Reino de Deus é interior: é o governo de Deus dentro do homem.</li>
-              <li>A manifestação do Reino acontece em vida, quando o Espírito Santo desperta a pessoa.</li>
-              <li>A vinda de Jesus é individual, invisível e ligada ao momento da morte.</li>
-              <li>A vida é o tribunal em andamento; a morte é o veredito revelado.</li>
-            </ul>
-
-            <p class="pergunta">
-              Hoje, o Reino de Deus já está governando dentro de você,
-              ou você só conhece Jesus de ouvir falar?
-            </p>
-
-            <p>
-              Se você percebe que ainda está longe, não se desespere —
-              mas também não finja que está tudo bem.  
-              Fale com Deus com sinceridade:
-            </p>
-
-            <p>
-              “Jesus, eu não quero só religião.  
-              Eu quero o Teu Reino dentro de mim.  
-              Confronta o meu pecado e começa hoje o Teu governo no meu coração.”
-            </p>
-
-            <p>
-              No próximo capítulo, vamos voltar ao início de tudo:
-              <strong>a queda, a serpente e a guerra espiritual que começou no Éden.</strong>
-            </p>
-          </div>
-        </section>
-      </section>
-
-      <!-- ========== CAPÍTULO 2 ========== -->
-      <section id="cap2" class="page-section">
-        <div class="tag-capitulo">Capítulo 2</div>
-        <h1>A Queda, o Pecado, a Serpente e a Guerra Espiritual</h1>
-        <p class="subtitulo">
-          Entenda o que realmente aconteceu no Éden, por que a serpente foi amaldiçoada
-          e como isso revelou a batalha espiritual que define toda a existência humana.
-        </p>
-
-        <section>
-          <p class="saudacao">
-            Que a verdade do Espírito Santo abra seus olhos enquanto você lê estas palavras.
-          </p>
-
-          <p>
-            Agora que você entendeu que o Reino de Deus é <strong>interior</strong>,
-            e que a vida é o tempo em que somos julgados, precisamos voltar ao começo:
-            <span class="destaque">o Éden</span>.
-          </p>
-
-          <p>
-            Porque ali começou a guerra espiritual que estamos enfrentando até hoje.
-          </p>
-
-          <h2>1. Quem realmente pecou no Éden?</h2>
-
-          <p>
-            Muita gente pensa que tudo começou com Adão e Eva.  
-            Mas a Bíblia mostra que já havia um agente caído ali dentro:
-          </p>
-
-          <div class="verso">
-            <p>
-              “Ora, a serpente era o mais astuto de todos os animais do campo…”
-            </p>
-            <small>Gênesis 3:1 — NTLH</small>
-          </div>
-
-          <p>
-            A serpente não era neutra. Ela já estava corrompida.  
-            Jesus revela quem estava por trás dela:
-          </p>
-
-          <div class="verso">
-            <p>
-              “Ele foi homicida desde o princípio... e é o pai da mentira.”
-            </p>
-            <small>João 8:44 — NTLH</small>
-          </div>
-
-          <p>
-            Então a ordem é:
-          </p>
-
-          <ul>
-            <li><strong>Primeiro</strong> peca o espírito da serpente (Satanás).</li>
-            <li><strong>Depois</strong> Eva, enganada.</li>
-            <li><strong>Depois</strong> Adão, aceitando a queda junto com ela.</li>
-          </ul>
-
-          <p>
-            A queda não começou no homem.  
-            A queda começou na rebelião espiritual.
-          </p>
-
-          <h2>2. Por que a serpente foi amaldiçoada?</h2>
-
-          <p>
-            Se a serpente só “cumprisse um papel”, Deus não a amaldiçoaria.
-            Mas Deus julga a serpente porque ela agiu por vontade própria
-            contra o plano de Deus.
-          </p>
-
-          <div class="verso">
-            <p>
-              “Você vai rastejar sobre o seu ventre e comer pó todos os dias da sua vida.”
-            </p>
-            <small>Gênesis 3:14</small>
-          </div>
-
-          <p>
-            Rastejar = tornar-se menor do que todos.  
-            Comer pó = alimentar-se do homem, que foi feito do pó.
-          </p>
-
-          <p class="destaque">
-            O maligno se alimenta da queda humana.  
-            Cada pecado é alimento para o reino das trevas.
-          </p>
-
-          <h2>3. O homem que se torna demônio</h2>
-
-          <p>
-            A revelação que o Espírito te deu é simples e profunda:
-          </p>
-
-          <p class="destaque">
-            Assim como um santo, ao morrer, permanece santo e se junta ao Reino de Deus,
-            o ímpio, ao morrer, permanece ímpio e se junta ao reino das trevas.
-          </p>
-
-          <div class="verso">
-            <p>
-              “Quem é injusto continue na injustiça.  
-              Quem é santo continue a santificar-se.”
-            </p>
-            <small>Apocalipse 22:11</small>
-          </div>
-
-          <p>
-            A morte não muda ninguém.  
-            A morte só sela o que a pessoa se tornou em vida.
-          </p>
-
-          <ul>
-            <li>O santo continua santo — e passa a fazer parte do Reino da luz.</li>
-            <li>O ímpio continua ímpio — e passa a reforçar o reino das trevas.</li>
-          </ul>
-
-          <h2>4. O santo que se torna “anjo”</h2>
-
-          <p>
-            A Bíblia dá vislumbres disso:
-          </p>
-
-          <p class="destaque">
-            Moisés e Elias aparecem glorificados com Jesus.
-          </p>
-
-          <div class="verso">
-            <p>
-              “E apareceram Moisés e Elias, falando com Jesus.”
-            </p>
-            <small>Mateus 17:3</small>
-          </div>
-
-          <p>
-            A descrição é igual à dos anjos:
-          </p>
-
-          <ul>
-            <li>Roupas brancas.</li>
-            <li>Glória.</li>
-            <li>Presença celestial.</li>
-          </ul>
-
-          <div class="verso">
-            <p>
-              “Suas roupas brilhavam como relâmpago...”
-            </p>
-            <small>Lucas 24:4</small>
-          </div>
-
-          <p>
-            Em Apocalipse vemos:
-          </p>
-
-          <div class="verso">
-            <p>
-              “Os exércitos do céu o seguiam, vestidos de linho finíssimo, branco e puro.”
-            </p>
-            <small>Apocalipse 19:14</small>
-          </div>
-
-          <p>
-            Esses exércitos são os santos glorificados, não anjos “neutros”.
-            É o povo que venceu em vida e agora participa da guerra espiritual
-            do lado de Cristo.
-          </p>
-
-          <h2>5. O reino das trevas vs o Reino da luz</h2>
-
-          <p>
-            A partir do Éden, dois reinos passaram a atuar sobre a terra:
-          </p>
-
-          <ul>
-            <li><strong>Reino de Deus:</strong> luz, ordem, santidade, vida.</li>
-            <li><strong>Reino das trevas:</strong> mentira, corrupção, morte, caos.</li>
-          </ul>
-
-          <div class="verso">
-            <p>
-              “Ele nos libertou do poder das trevas e nos trouxe para o Reino
-              do Seu Filho amado.”
-            </p>
-            <small>Colossenses 1:13</small>
-          </div>
-
-          <p>
-            Ninguém nasce neutro.  
-            Ou está debaixo do domínio das trevas,  
-            ou é arrancado de lá e colocado no Reino de Cristo.
-          </p>
-
-          <p class="destaque">
-            Todo ser humano está em guerra, queira ou não.
-          </p>
-
-          <h2>6. Por que o mundo jaz no maligno</h2>
-
-          <div class="verso">
-            <p>
-              “O mundo inteiro jaz no maligno.”
-            </p>
-            <small>1 João 5:19</small>
-          </div>
-
-          <p>
-            Satanás perdeu o Éden, mas ganhou o resto do mundo:
-          </p>
-
-          <div class="verso">
-            <p>
-              “Todos os reinos do mundo me foram entregues, e eu os dou a quem eu quiser.”
-            </p>
-            <small>Lucas 4:6</small>
-          </div>
-
-          <p>
-            Jesus não contesta.  
-            Isso mostra que:
-          </p>
-
-          <ul>
-            <li>O sistema político é inclinado ao mal.</li>
-            <li>O sistema econômico é inclinado ao egoísmo.</li>
-            <li>O sistema religioso pode ser corrompido.</li>
-          </ul>
-
-          <p>
-            Este é o cenário: o Reino de Deus dentro de você,
-            cercado por um mundo governado pelo maligno.
-          </p>
-
-          <h2>7. A vida como treinamento espiritual</h2>
-
-          <p class="destaque">
-            A vida é um campo de treinamento para definir
-            de qual reino você fará parte eternamente.
-          </p>
-
-          <ul>
-            <li>O Espírito Santo te puxa para cima.</li>
-            <li>O mundo e a serpente tentam te puxar para baixo.</li>
-          </ul>
-
-          <div class="verso">
-            <p>
-              “Quem quiser salvar a sua vida, perdê-la-á;  
-              mas quem perder a sua vida por Minha causa, encontrá-la-á.”
-            </p>
-            <small>Mateus 16:25</small>
-          </div>
-
-          <p>
-            Cada escolha é um tijolo no seu destino eterno.
-            A morte não muda ninguém, só revela quem você se tornou.
-          </p>
-
-          <div class="resumo-final">
-            <h2>Resumo do Capítulo 2</h2>
-
-            <ul>
-              <li>A serpente pecou antes do homem.</li>
-              <li>Adão e Eva foram enganados, mas também responsáveis.</li>
-              <li>A serpente foi amaldiçoada e passou a se alimentar da queda humana.</li>
-              <li>O ímpio morto continua ímpio; o santo morto continua santo.</li>
-              <li>Os santos glorificados participam do exército de Deus.</li>
-              <li>O mundo inteiro jaz no maligno.</li>
-              <li>A vida é treinamento para definir seu lugar eterno.</li>
-            </ul>
-
-            <p class="pergunta">
-              Com qual reino suas escolhas estão se alinhando hoje?
-            </p>
-
-            <p>
-              No próximo capítulo, vamos aprofundar:
-              <strong>a vinda de Jesus na morte de cada pessoa
-              e o que isso muda na forma de enxergar o “fim dos tempos”</strong>.
-            </p>
-          </div>
-        </section>
-      </section>
-
-      <!-- ========== CAPÍTULO 3 ========== -->
-      <section id="cap3" class="page-section">
-        <div class="tag-capitulo">Capítulo 3</div>
-        <h1>A Vinda de Jesus na Morte e o Fim Individual</h1>
-        <p class="subtitulo">Conteúdo em construção — será inserido depois.</p>
-      </section>
-
-      <!-- ========== CAPÍTULO 4 ========== -->
-      <section id="cap4" class="page-section">
-        <div class="tag-capitulo">Capítulo 4</div>
-        <h1>Daniel 10–12: As Três Eras</h1>
-        <p class="subtitulo">Conteúdo em construção — será inserido depois.</p>
-      </section>
-
-      <!-- ========== CAPÍTULO 5 ========== -->
-      <section id="cap5" class="page-section">
-        <div class="tag-capitulo">Capítulo 5</div>
-        <h1>As Sete Igrejas e o Fim</h1>
-        <p class="subtitulo">Conteúdo em construção — será inserido depois.</p>
-      </section>
-
-      <!-- ========== CAPÍTULO 6 ========== -->
-      <section id="cap6" class="page-section">
-        <div class="tag-capitulo">Capítulo 6</div>
-        <h1>A Primeira Besta e o Sistema Mundial</h1>
-        <p class="subtitulo">Conteúdo em construção — será inserido depois.</p>
-      </section>
-
-      <!-- ========== CAPÍTULO 7 ========== -->
-      <section id="cap7" class="page-section">
-        <div class="tag-capitulo">Capítulo 7</div>
-        <h1>A Segunda Besta, a Imagem e a Marca</h1>
-        <p class="subtitulo">Conteúdo em construção — será inserido depois.</p>
-      </section>
-
-      <!-- ========== CAPÍTULO 8 ========== -->
-      <section id="cap8" class="page-section">
-        <div class="tag-capitulo">Capítulo 8</div>
-        <h1>O Remanescente e a Missão Final</h1>
-        <p class="subtitulo">Conteúdo em construção — será inserido depois.</p>
-      </section>
-
-      <!-- ========== CAPÍTULO 9 ========== -->
-      <section id="cap9" class="page-section">
-        <div class="tag-capitulo">Capítulo 9</div>
-        <h1>O Último Tempo e a Glória dos Santos</h1>
-        <p class="subtitulo">Conteúdo em construção — será inserido depois.</p>
-      </section>
-
-      <!-- ========== TESTEMUNHOS ========== -->
-<section id="testemunhos" class="page-section">
-  <h2>Testemunhos</h2>
-
-  <!-- LISTA DE TESTEMUNHOS MANUAIS -->
-<div id="lista-testemunhos" style="margin-top: 1.8rem;">
-
-  <!-- ===== INICIO DO TESTEMUNHO 1 ===== -->
-  <div class="testemunho-item" style="margin-bottom: 2rem; padding-bottom: 1.2rem; border-bottom: 1px solid #2b2b40;">
-
-    <p><strong>Nome:</strong> <span style="color:#ffe58a; font-style:italic;">Anonima</span></p>
-
-    <p><strong>Cidade:</strong> 
-      <span style="color:#ffe58a; font-weight:700;">Porto Velho/RO</span>
-    </p>
-
-    <p><strong>Idade:</strong> 
-      <span style="color:#ffe58a; font-weight:700;">21 anos</span>
-    </p>
-
-    <p style="margin-top:0.6rem;"><strong>Testemunho:</strong></p>
-
-    <p style="font-style:italic;">
-      Eu e meu marido entregamos nossas vidas a Jesus Cristo, reconhecendo-O como nosso único e suficiente Salvador. Hoje caminhamos pelas ruas, batemos de porta em porta e visitamos igreja após igreja, anunciando as revelações bíblicas que aprendemos através do irmão Cássio Douglas, instrumento usado por Deus para nos despertar.
-      Sou grata ao Senhor por ter aberto meus olhos e permitido que eu enxergasse aquilo que muitos não percebem. De fato, este mundo jaz no maligno, e o plano terrível do inimigo está se acelerando diante de nós. Poucos conseguem discernir, e quando finalmente perceberem, poderá ser tarde demais. Muitos não terão coragem de abandonar seu conforto, sua rotina e a falsa facilidade que o anticristo oferece para seduzir as almas.
-      Mas nós escolhemos a luz. Escolhemos Cristo. E enquanto tivermos fôlego, continuaremos anunciando a verdade, para que outros também despertem antes que chegue a noite em que ninguém poderá trabalhar.
-    </p>
-
-  </div>
-  <!-- ===== FINAL DO TESTEMUNHO 1 ===== -->
-
-  <!-- (DEIXAR ASSIM E IR DUPLICANDO PARA NOVOS TESTEMUNHOS) -->
-
-</div>
-<!-- FIM DA LISTA DE TESTEMUNHOS -->
-  
-  <p>
-    Se o Senhor Jesus já fez algo profundo na sua vida e você sente no coração
-    de compartilhar, deixe registrado aqui. Estes testemunhos serão guardados
-    como memória diante de Deus e poderão, no tempo dEle, edificar outros irmãos.
-  </p>
-
-  <div style="margin-top: 1.5rem; border-radius: 12px; overflow: hidden; box-shadow: 0 0 18px rgba(0,0,0,0.35);">
-    <!-- SUBSTITUA APENAS O src PELO CÓDIGO QUE O GOOGLE FORMS GERAR -->
-    <iframe 
-      src="https://docs.google.com/forms/d/e/1FAIpQLScopqT_jVZTQ6Ediw5iqIBY0-NJ2Qn65NTWsYi4lcr2ak4RPA/viewform?usp=dialog"
-      width="100%" 
-      height="1400" 
-      frameborder="0" 
-      marginheight="0" 
-      marginwidth="0">
-      Carregando…
-    </iframe>
-  </div>
-
-  <p style="margin-top: 1rem; font-size: 0.9rem; opacity: 0.8;">
-    ⚠ Os testemunhos não serão exibidos automaticamente no site.
-    Eles ficarão armazenados em segurança e serão lidos com temor e discernimento,
-    para a glória de Deus.
-  </p>
-</section>
-
+    <div class="chips">
+      <div class="chip" id="chipUser">Usuário: <b>—</b></div>
+      <div class="chip" id="chipRole">Role: <b>—</b></div>
+      <div class="chip" id="chipGate">Gate: <b>—</b></div>
+      <div class="chip" id="chipLic">Licença: <b>—</b></div>
     </div>
-  </main>
+  </div>
+
+  <div class="grid">
+
+    <!-- LEFT NAV -->
+    <div class="card">
+      <h2>Menu <span class="hint mono" id="modeHint">modo: —</span></h2>
+      <div class="body">
+        <div class="nav" id="nav"></div>
+        <div class="hr"></div>
+        <div class="muted">
+          <b>Notas</b><br/>
+          • Este MVP salva em <span class="mono">localStorage</span>.<br/>
+          • “Senha” aqui é só demo local (não use em produção).<br/>
+          • Para produção: backend valida login/licença/sig/nonce.
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="card">
+      <h2>
+        <span id="viewTitle">Login</span>
+        <span class="copybar">
+          <button class="secondary" id="btnExportAll" title="Exporta PB + bandejas + dados">Exportar Tudo</button>
+          <button class="secondary" id="btnReset" title="Apaga dados locais">Reset Local</button>
+        </span>
+      </h2>
+      <div class="body" id="view"></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <div id="toastMsg"></div>
+  <div class="small" id="toastSub"></div>
+</div>
 
 <script>
-  function showSection(id) {
-    // 1. Esconde todas as páginas
-    var sections = document.querySelectorAll('.page-section');
-    for (var i = 0; i < sections.length; i++) {
-      sections[i].classList.remove('active');
-    }
+/**
+ * LEV Site MVP (local)
+ * - Armazena dados do usuário em localStorage
+ * - Simula licença 30 dias
+ * - Suporta sync Copia-e-Cola (LEV_DOWNLOAD / LEV_UPLOAD)
+ * - Suporta bandejas (EXIT_TRAY / ADMIN_EXIT_TRAY)
+ *
+ * IMPORTANTE: Para produção, mover auth/licença/sig/nonce para backend.
+ */
 
-    // 2. Mostra a página clicada
-    var target = document.getElementById(id);
-    if (target) {
-      target.classList.add('active');
-    }
+const PB_VERSION = "1.7";
+const STORE_KEY = "LEV_SITE_MVP_V1";
+const nowISO = () => new Date().toISOString();
+const addDays = (d, days) => new Date(d.getTime() + days*24*60*60*1000);
 
-    // 3. Remove destaque de todos os botões
-    var allButtons = document.querySelectorAll('.nav-btn');
-    for (var b = 0; b < allButtons.length; b++) {
-      allButtons[b].classList.remove('nav-btn-primary');
-    }
+function toast(msg, sub=""){
+  const t = document.getElementById("toast");
+  document.getElementById("toastMsg").textContent = msg;
+  document.getElementById("toastSub").textContent = sub;
+  t.style.display = "block";
+  clearTimeout(toast._tm);
+  toast._tm = setTimeout(()=> t.style.display="none", 3300);
+}
 
-    // 4. Ativa o botão correspondente
-    if (id === 'intro') {
-      document.getElementById('btn-intro').classList.add('nav-btn-primary');
-    } else if (id === 'testemunhos') {
-      document.getElementById('btn-testemunhos').classList.add('nav-btn-primary');
-    } else if (id.startsWith('cap')) {
-      document.getElementById('btn-caps').classList.add('nav-btn-primary');
-    }
+function load(){
+  const raw = localStorage.getItem(STORE_KEY);
+  if(!raw){
+    const seed = {
+      pb_version: PB_VERSION,
+      access_gate: { active:false, activation_id:"", issued_at:"", activated_by:"", sig:"" },
+      session: { logged_in:false, user_id:"", role:"", username:"" },
+      users: {
+        // demo: senha em texto puro é INSEGURO. Aqui é somente MVP local.
+        // produção: use hash no backend.
+        "LEV-ADM-0001": {
+          user_id:"LEV-ADM-0001",
+          username:"admin",
+          password:"lev2026", // DEMO
+          role:"ADM",
+          created_at: nowISO(),
+          license: { status:"ACTIVE", expires_at: addDays(new Date(), 30).toISOString() },
+          preferences: { idioma:"pt", formato_resposta:"estruturado", nivel_detalhe:"alto", modo_perguntas:"local" },
+          perfil_operacional: { style:"medio", format:"checklist", ask_bias:"medio", cadence:"normal", risk_posture:"padrao" },
+          context_tray: { mode:"OFF", retention_days:0, updated_at: nowISO(), content:"" },
+          user_space: { listas:"", afazeres:"", projetos:"LEV\n", compras:"", financeiro:"", planilhas:"", anotacoes:"" },
+          trays: { exit_tray:"", admin_exit_tray:"" }
+        }
+      },
+      logs: []
+    };
+    localStorage.setItem(STORE_KEY, JSON.stringify(seed));
+    return seed;
+  }
+  return JSON.parse(raw);
+}
+function save(state){ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
 
-    // 5. Atualiza a âncora da URL (#intro, #cap2, #testemunhos...)
-    window.location.hash = id;
+let state = load();
 
-    // 6. Volta para o topo
-    window.scrollTo(0, 0);
+function logEvt(type, details={}){
+  state.logs.unshift({ at: nowISO(), type, details });
+  if(state.logs.length > 300) state.logs.pop();
+  save(state);
+}
+
+function licenseInfo(u){
+  const exp = new Date(u.license.expires_at);
+  const diff = exp.getTime() - Date.now();
+  const days = Math.ceil(diff / (24*60*60*1000));
+  const status = diff <= 0 ? "EXPIRED" : u.license.status;
+  return { status, expires_at:u.license.expires_at, expires_in_days: Math.max(days,0) };
+}
+
+function gateActive(){
+  return !!(state.access_gate && state.access_gate.active);
+}
+
+function currentUser(){
+  if(!state.session.logged_in) return null;
+  return state.users[state.session.user_id] || null;
+}
+
+function isReadOnly(u){
+  // READ_ONLY se gate ausente OU licença expirada
+  const li = licenseInfo(u);
+  if(!gateActive()) return true;
+  if(li.status !== "ACTIVE") return true;
+  return false;
+}
+
+function setChips(){
+  const u = currentUser();
+  const chipUser = document.getElementById("chipUser");
+  const chipRole = document.getElementById("chipRole");
+  const chipGate = document.getElementById("chipGate");
+  const chipLic  = document.getElementById("chipLic");
+
+  document.getElementById("pbVer").textContent = "PB v"+PB_VERSION;
+
+  if(!u){
+    chipUser.innerHTML = 'Usuário: <b>—</b>';
+    chipRole.innerHTML = 'Role: <b>—</b>';
+    chipGate.innerHTML = 'Gate: <b>—</b>';
+    chipLic.innerHTML  = 'Licença: <b>—</b>';
+    chipUser.className = "chip";
+    chipRole.className = "chip";
+    chipGate.className = "chip";
+    chipLic.className  = "chip";
+    document.getElementById("modeHint").textContent = "modo: —";
+    return;
   }
 
-  // Quando a página carregar, abre a seção baseada na âncora da URL
-  document.addEventListener('DOMContentLoaded', function () {
-    var hash = window.location.hash.replace('#', '');
+  const li = licenseInfo(u);
+  const ro = isReadOnly(u);
 
-    if (hash) {
-      // Se tiver #cap2, #testemunhos etc, abre essa página
-      showSection(hash);
-    } else {
-      // Se não tiver nada na URL, cai na INTRODUÇÃO
-      showSection('intro');
-    }
+  chipUser.innerHTML = `Usuário: <b>${u.user_id}</b>`;
+  chipRole.innerHTML = `Role: <b>${u.role}</b>`;
+  chipGate.innerHTML = `Gate: <b>${gateActive() ? "ATIVO" : "AUSENTE"}</b>`;
+  chipLic.innerHTML  = `Licença: <b>${li.status}</b> (${li.expires_in_days}d)`;
+
+  chipGate.className = "chip " + (gateActive() ? "ok" : "warn");
+  chipLic.className  = "chip " + (li.status==="ACTIVE" ? "ok" : "bad");
+  chipRole.className = "chip " + (u.role==="ADM" ? "warn" : "");
+  document.getElementById("modeHint").textContent = "modo: " + (u.role==="ADM" ? "ADM" : "USUÁRIO") + (ro ? " (READ_ONLY)" : "");
+}
+
+function navItems(){
+  const u = currentUser();
+  if(!u){
+    return [
+      { id:"login", label:"Login", hint:"entrar" },
+      { id:"about", label:"Sobre", hint:"PB/limites" },
+    ];
+  }
+  const ro = isReadOnly(u);
+  const base = [
+    { id:"home", label:"Painel", hint:"status" },
+    { id:"user_space", label:"User Space", hint:"texto" },
+    { id:"prefs", label:"Preferências", hint:"formato" },
+    { id:"context", label:"Contexto", hint:"opt-in" },
+    { id:"trays", label:"Bandejas", hint:"exit/admin" },
+    { id:"sync", label:"Sync Copia-e-Cola", hint:"upload/download" },
+    { id:"commands", label:"Comandos ADM", hint:"lista" },
+    { id:"logs", label:"Logs", hint:"audit" },
+  ];
+  if(u.role==="ADM") base.unshift({ id:"admin", label:"Admin", hint: ro ? "read-only" : "controle" });
+  base.push({ id:"logout", label:"Sair", hint:"logout" });
+  return base;
+}
+
+function renderNav(activeId){
+  const nav = document.getElementById("nav");
+  nav.innerHTML = "";
+  navItems().forEach(it=>{
+    const b = document.createElement("button");
+    b.className = (it.id===activeId) ? "ok" : "secondary";
+    b.innerHTML = `<span>${it.label}</span><span class="hint mono">${it.hint||""}</span>`;
+    b.onclick = ()=> route(it.id);
+    nav.appendChild(b);
   });
+}
+
+function viewTitle(t){ document.getElementById("viewTitle").textContent = t; }
+
+function route(id){
+  setChips();
+  renderNav(id);
+
+  const u = currentUser();
+  const v = document.getElementById("view");
+
+  // logout pseudo-route
+  if(id==="logout"){
+    state.session = { logged_in:false, user_id:"", role:"", username:"" };
+    save(state); logEvt("logout");
+    toast("Sessão encerrada.");
+    return route("login");
+  }
+
+  if(id==="login"){
+    viewTitle("Login");
+    v.innerHTML = `
+      <div class="muted">Entre com um usuário local (MVP). Em produção, isso vem do seu servidor.</div>
+      <div class="hr"></div>
+      <div class="field">
+        <label>User ID</label>
+        <input id="inUser" placeholder="ex: LEV-ADM-0001" />
+      </div>
+      <div class="field">
+        <label>Senha (demo local)</label>
+        <input id="inPass" type="password" placeholder="ex: lev2026" />
+      </div>
+      <div class="btnrow">
+        <button class="ok" id="btnLogin">Entrar</button>
+        <button class="secondary" id="btnCreateUser">Criar USER demo</button>
+      </div>
+      <div class="hr"></div>
+      <div class="muted">
+        <b>Demo pronta:</b><br/>
+        • <span class="mono">LEV-ADM-0001</span> / <span class="mono">lev2026</span> (ADM)<br/>
+        <span class="dangerText">Não use isso em produção.</span>
+      </div>
+    `;
+    document.getElementById("btnLogin").onclick = ()=>{
+      const uid = (document.getElementById("inUser").value||"").trim();
+      const pw  = (document.getElementById("inPass").value||"").trim();
+      const usr = state.users[uid];
+      if(!usr || usr.password !== pw){
+        toast("Login inválido.", "Verifique user_id e senha (demo).");
+        logEvt("login_fail", { uid });
+        return;
+      }
+      state.session = { logged_in:true, user_id:usr.user_id, role:usr.role, username:usr.username||"" };
+      save(state); logEvt("login_ok", { uid, role:usr.role });
+      toast("Login OK.", `Bem-vindo: ${usr.user_id} (${usr.role})`);
+      route("home");
+    };
+    document.getElementById("btnCreateUser").onclick = ()=>{
+      const newId = "LEV-U-" + Math.random().toString(36).slice(2,7).toUpperCase();
+      state.users[newId] = {
+        user_id:newId, username:"user", password:"1234", role:"USER", created_at:nowISO(),
+        license:{ status:"ACTIVE", expires_at:addDays(new Date(),30).toISOString() },
+        preferences:{ idioma:"pt", formato_resposta:"estruturado", nivel_detalhe:"medio", modo_perguntas:"local" },
+        perfil_operacional:{ style:"medio", format:"checklist", ask_bias:"medio", cadence:"normal", risk_posture:"padrao" },
+        context_tray:{ mode:"OFF", retention_days:0, updated_at:nowISO(), content:"" },
+        user_space:{ listas:"", afazeres:"", projetos:"", compras:"", financeiro:"", planilhas:"", anotacoes:"" },
+        trays:{ exit_tray:"", admin_exit_tray:"" }
+      };
+      save(state); logEvt("user_created_demo", { user_id:newId });
+      toast("USER demo criado.", `ID: ${newId} / senha: 1234`);
+      document.getElementById("inUser").value = newId;
+      document.getElementById("inPass").value = "1234";
+    };
+    return;
+  }
+
+  if(id==="about"){
+    viewTitle("Sobre");
+    v.innerHTML = `
+      <div class="muted">
+        <b>O que este site é:</b> um console textual do LEV (MVP local), pronto para você codificar depois.<br/><br/>
+        <b>O que ele não é:</b> servidor real de autenticação/licença/assinaturas. Em produção isso fica no backend.<br/><br/>
+        <b>PB_ACCESS_GATE:</b> aqui ele bloqueia escrita quando ausente (modo READ_ONLY). Ative em Admin → Gate.
+      </div>
+    `;
+    return;
+  }
+
+  // Require login after this point
+  if(!u) return route("login");
+
+  // Views
+  if(id==="home"){
+    viewTitle("Painel");
+    const li = licenseInfo(u);
+    const ro = isReadOnly(u);
+    v.innerHTML = `
+      <div class="kpi">
+        <div class="box"><div class="t">PB</div><div class="v mono">v${PB_VERSION}</div></div>
+        <div class="box"><div class="t">Gate</div><div class="v ${gateActive()?'okText':'warnText'}">${gateActive()?'ATIVO':'AUSENTE (READ_ONLY)'}</div></div>
+        <div class="box"><div class="t">Licença</div><div class="v ${li.status==='ACTIVE'?'okText':'dangerText'}">${li.status} — ${li.expires_in_days} dias</div></div>
+      </div>
+      <div class="hr"></div>
+      <div class="muted">
+        <b>Estado</b><br/>
+        • Usuário: <span class="mono">${u.user_id}</span><br/>
+        • Role: <span class="mono">${u.role}</span><br/>
+        • Modo: <span class="mono">${u.role==="ADM"?"ADM":"USUÁRIO"}</span>${ro ? ' <span class="warnText">(READ_ONLY)</span>' : ''}<br/>
+      </div>
+      <div class="hr"></div>
+      <div class="btnrow">
+        <button class="secondary" onclick="route('sync')">Sync Copia-e-Cola</button>
+        <button class="secondary" onclick="route('trays')">Bandejas</button>
+        <button class="secondary" onclick="route('user_space')">User Space</button>
+      </div>
+    `;
+    return;
+  }
+
+  if(id==="admin"){
+    viewTitle("Admin");
+    const li = licenseInfo(u);
+    const ro = isReadOnly(u);
+    v.innerHTML = `
+      <div class="muted">
+        <b>Admin Console</b><br/>
+        • Este painel controla <span class="mono">PB_ACCESS_GATE</span> (demo) e a licença (demo).<br/>
+        • Em produção, tudo isso fica no backend.
+      </div>
+      <div class="hr"></div>
+
+      <div class="split">
+        <div>
+          <h3 style="margin:0 0 8px 0; font-size:13px;">PB_ACCESS_GATE</h3>
+          <div class="muted">Sem Gate → READ_ONLY (bloqueia escrita/exportação).</div>
+          <div class="field">
+            <label>Activated By</label>
+            <select id="gateBy">
+              <option>SITE</option><option>APP</option><option>CLI</option>
+            </select>
+          </div>
+          <div class="btnrow">
+            <button class="ok" id="btnGateOn">Ativar Gate (demo)</button>
+            <button class="danger" id="btnGateOff">Remover Gate</button>
+          </div>
+          <div class="hr"></div>
+          <div class="field">
+            <label>Bloco atual</label>
+            <textarea id="gateBlock" readonly></textarea>
+          </div>
+          <div class="btnrow">
+            <button class="secondary" id="btnCopyGate">Copiar bloco</button>
+          </div>
+        </div>
+
+        <div>
+          <h3 style="margin:0 0 8px 0; font-size:13px;">Licença (demo local)</h3>
+          <div class="muted">Status: <b class="${li.status==='ACTIVE'?'okText':'dangerText'}">${li.status}</b> — expira em <span class="mono">${li.expires_at}</span></div>
+          <div class="btnrow" style="margin-top:10px">
+            <button class="ok" id="btnRenew">Renovar +30 dias</button>
+            <button class="danger" id="btnExpire">Expirar agora</button>
+          </div>
+          <div class="hr"></div>
+
+          <h3 style="margin:0 0 8px 0; font-size:13px;">Read-only</h3>
+          <div class="muted">Read-only é automático se Gate ausente OU Licença expirada.</div>
+          <div class="muted">Estado atual: ${ro ? '<b class="warnText">READ_ONLY</b>' : '<b class="okText">FULL</b>'}</div>
+
+          <div class="hr"></div>
+          <h3 style="margin:0 0 8px 0; font-size:13px;">Comandos (referência)</h3>
+          <div class="muted mono">
+            UPDATE<br/>
+            ATUALIZAR LEV MAXIMO BUDGET_MIN=60 RISCO_MAX=MEDIO<br/>
+            LEV_SECURITY_APPLY MODE=manual RISK=low<br/>
+            LEV_SECURITY_VERIFY CHECKS=root,health,api_ping RISK=low
+          </div>
+        </div>
+      </div>
+    `;
+
+    const blockEl = document.getElementById("gateBlock");
+    function renderGateBlock(){
+      if(!state.access_gate.active){
+        blockEl.value = "(Gate ausente)";
+        return;
+      }
+      blockEl.value =
+`===LEV_PB_ACCESS_BEGIN===
+activated_by: ${state.access_gate.activated_by}
+activation_id: ${state.access_gate.activation_id}
+issued_at: ${state.access_gate.issued_at}
+sig: ${state.access_gate.sig}
+===LEV_PB_ACCESS_END===`;
+    }
+    renderGateBlock();
+
+    document.getElementById("btnGateOn").onclick = ()=>{
+      state.access_gate.active = true;
+      state.access_gate.activated_by = document.getElementById("gateBy").value;
+      state.access_gate.activation_id = "ACT-" + Math.random().toString(36).slice(2,10).toUpperCase();
+      state.access_gate.issued_at = nowISO();
+      state.access_gate.sig = "SIG_DEMO_" + Math.random().toString(36).slice(2,8).toUpperCase();
+      save(state); logEvt("gate_on", { activation_id: state.access_gate.activation_id });
+      renderGateBlock(); setChips();
+      toast("Gate ativado (demo).", "Agora FULL MODE depende da licença.");
+      route("admin");
+    };
+    document.getElementById("btnGateOff").onclick = ()=>{
+      state.access_gate = { active:false, activation_id:"", issued_at:"", activated_by:"", sig:"" };
+      save(state); logEvt("gate_off");
+      renderGateBlock(); setChips();
+      toast("Gate removido.", "READ_ONLY ativo.");
+      route("admin");
+    };
+    document.getElementById("btnCopyGate").onclick = async ()=>{
+      await navigator.clipboard.writeText(blockEl.value);
+      toast("Bloco copiado.");
+    };
+
+    document.getElementById("btnRenew").onclick = ()=>{
+      const exp = new Date(u.license.expires_at);
+      const base = exp.getTime() < Date.now() ? new Date() : exp;
+      u.license.status = "ACTIVE";
+      u.license.expires_at = addDays(base, 30).toISOString();
+      state.users[u.user_id] = u;
+      save(state); logEvt("license_renew", { user_id:u.user_id });
+      toast("Licença renovada +30 dias.");
+      route("admin");
+    };
+    document.getElementById("btnExpire").onclick = ()=>{
+      u.license.status = "EXPIRED";
+      u.license.expires_at = new Date(Date.now()-1000).toISOString();
+      state.users[u.user_id] = u;
+      save(state); logEvt("license_expire", { user_id:u.user_id });
+      toast("Licença expirada.", "READ_ONLY ativo.");
+      route("admin");
+    };
+    return;
+  }
+
+  if(id==="user_space"){
+    viewTitle("User Space");
+    const ro = isReadOnly(u);
+    const categories = ["listas","afazeres","projetos","compras","financeiro","planilhas","anotacoes"];
+    v.innerHTML = `
+      <div class="muted">
+        Tudo aqui é <b>texto claro</b>. ${ro ? '<span class="warnText">READ_ONLY: escrita bloqueada.</span>' : 'Você pode editar e salvar.'}
+      </div>
+      <div class="hr"></div>
+      <div class="field">
+        <label>Categoria</label>
+        <select id="usCat">${categories.map(c=>`<option value="${c}">${c}</option>`).join("")}</select>
+      </div>
+      <div class="field">
+        <label>Conteúdo</label>
+        <textarea id="usText" ${ro?'readonly':''}></textarea>
+      </div>
+      <div class="btnrow">
+        <button class="ok" id="btnSaveUS" ${ro?'disabled':''}>Salvar</button>
+        <button class="secondary" id="btnCopyUS">Copiar bloco LEV_USER_DATA</button>
+      </div>
+    `;
+    const cat = document.getElementById("usCat");
+    const txt = document.getElementById("usText");
+    function loadCat(){
+      txt.value = (u.user_space[cat.value] || "");
+    }
+    cat.onchange = loadCat;
+    loadCat();
+
+    document.getElementById("btnSaveUS").onclick = ()=>{
+      u.user_space[cat.value] = txt.value;
+      state.users[u.user_id] = u;
+      save(state); logEvt("user_space_save", { user_id:u.user_id, cat:cat.value });
+      toast("User Space salvo.", cat.value);
+    };
+    document.getElementById("btnCopyUS").onclick = async ()=>{
+      const block =
+`===LEV_USER_DATA_BEGIN===
+user_id: ${u.user_id}
+category: ${cat.value}
+title:
+updated_at: ${nowISO()}
+
+${txt.value}
+===LEV_USER_DATA_END===`;
+      await navigator.clipboard.writeText(block);
+      toast("Bloco LEV_USER_DATA copiado.");
+    };
+    return;
+  }
+
+  if(id==="prefs"){
+    viewTitle("Preferências");
+    const ro = isReadOnly(u);
+    v.innerHTML = `
+      <div class="split">
+        <div>
+          <div class="muted">${ro ? '<span class="warnText">READ_ONLY: escrita bloqueada.</span>' : 'Edite e salve preferências/perfil operacional.'}</div>
+          <div class="hr"></div>
+
+          <h3 style="margin:0 0 8px 0; font-size:13px;">Preferências</h3>
+          <div class="field"><label>Idioma</label><input id="pLang" value="${u.preferences.idioma||'pt'}" ${ro?'readonly':''}/></div>
+          <div class="field"><label>Formato</label><input id="pFmt" value="${u.preferences.formato_resposta||'estruturado'}" ${ro?'readonly':''}/></div>
+          <div class="field"><label>Nível detalhe</label><input id="pDet" value="${u.preferences.nivel_detalhe||'medio'}" ${ro?'readonly':''}/></div>
+          <div class="field"><label>Modo perguntas</label><input id="pQ" value="${u.preferences.modo_perguntas||'local'}" ${ro?'readonly':''}/></div>
+
+          <div class="btnrow">
+            <button class="ok" id="btnSavePrefs" ${ro?'disabled':''}>Salvar</button>
+            <button class="secondary" id="btnCopyPrefs">Copiar (texto)</button>
+          </div>
+        </div>
+
+        <div>
+          <h3 style="margin:0 0 8px 0; font-size:13px;">Perfil Operacional (opt-in)</h3>
+          <div class="field"><label>Style</label><input id="oStyle" value="${u.perfil_operacional.style||'medio'}" ${ro?'readonly':''}/></div>
+          <div class="field"><label>Format</label><input id="oFmt" value="${u.perfil_operacional.format||'checklist'}" ${ro?'readonly':''}/></div>
+          <div class="field"><label>Ask bias</label><input id="oAsk" value="${u.perfil_operacional.ask_bias||'medio'}" ${ro?'readonly':''}/></div>
+          <div class="field"><label>Cadence</label><input id="oCad" value="${u.perfil_operacional.cadence||'normal'}" ${ro?'readonly':''}/></div>
+          <div class="field"><label>Risk posture</label><input id="oRisk" value="${u.perfil_operacional.risk_posture||'padrao'}" ${ro?'readonly':''}/></div>
+
+          <div class="btnrow">
+            <button class="ok" id="btnSaveOps" ${ro?'disabled':''}>Salvar</button>
+            <button class="secondary" id="btnCopyOps">Copiar (texto)</button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.getElementById("btnSavePrefs").onclick = ()=>{
+      u.preferences = {
+        idioma: document.getElementById("pLang").value.trim(),
+        formato_resposta: document.getElementById("pFmt").value.trim(),
+        nivel_detalhe: document.getElementById("pDet").value.trim(),
+        modo_perguntas: document.getElementById("pQ").value.trim(),
+      };
+      state.users[u.user_id]=u; save(state); logEvt("prefs_save",{user_id:u.user_id});
+      toast("Preferências salvas.");
+    };
+    document.getElementById("btnSaveOps").onclick = ()=>{
+      u.perfil_operacional = {
+        style: document.getElementById("oStyle").value.trim(),
+        format: document.getElementById("oFmt").value.trim(),
+        ask_bias: document.getElementById("oAsk").value.trim(),
+        cadence: document.getElementById("oCad").value.trim(),
+        risk_posture: document.getElementById("oRisk").value.trim(),
+      };
+      state.users[u.user_id]=u; save(state); logEvt("ops_save",{user_id:u.user_id});
+      toast("Perfil operacional salvo.");
+    };
+
+    document.getElementById("btnCopyPrefs").onclick = async ()=>{
+      const txt =
+`idioma=${u.preferences.idioma}
+formato_resposta=${u.preferences.formato_resposta}
+nivel_detalhe=${u.preferences.nivel_detalhe}
+modo_perguntas=${u.preferences.modo_perguntas}`;
+      await navigator.clipboard.writeText(txt);
+      toast("Preferências copiadas.");
+    };
+    document.getElementById("btnCopyOps").onclick = async ()=>{
+      const txt =
+`style=${u.perfil_operacional.style}
+format=${u.perfil_operacional.format}
+ask_bias=${u.perfil_operacional.ask_bias}
+cadence=${u.perfil_operacional.cadence}
+risk_posture=${u.perfil_operacional.risk_posture}`;
+      await navigator.clipboard.writeText(txt);
+      toast("Perfil operacional copiado.");
+    };
+    return;
+  }
+
+  if(id==="context"){
+    viewTitle("Contexto");
+    const ro = isReadOnly(u);
+    v.innerHTML = `
+      <div class="muted">
+        <b>CONTEXT_TRAY</b> é opt-in. ${ro ? '<span class="warnText">READ_ONLY: escrita bloqueada.</span>' : 'Você pode ativar e salvar.'}
+      </div>
+      <div class="hr"></div>
+      <div class="field">
+        <label>Modo</label>
+        <select id="ctxMode" ${ro?'disabled':''}>
+          ${["OFF","MANUAL","AUTO_RESUMO","FULL"].map(m=>`<option ${u.context_tray.mode===m?'selected':''}>${m}</option>`).join("")}
+        </select>
+      </div>
+      <div class="field">
+        <label>Retenção (dias)</label>
+        <input id="ctxRet" type="number" min="0" value="${u.context_tray.retention_days||0}" ${ro?'readonly':''}/>
+      </div>
+      <div class="field">
+        <label>Conteúdo (texto/resumo)</label>
+        <textarea id="ctxTxt" ${ro?'readonly':''}>${u.context_tray.content||""}</textarea>
+      </div>
+      <div class="btnrow">
+        <button class="ok" id="btnCtxSave" ${ro?'disabled':''}>Salvar</button>
+        <button class="danger" id="btnCtxClear" ${ro?'disabled':''}>Limpar</button>
+        <button class="secondary" id="btnCtxCopy">Copiar bloco CONTEXT_TRAY</button>
+      </div>
+    `;
+    document.getElementById("btnCtxSave").onclick = ()=>{
+      u.context_tray.mode = document.getElementById("ctxMode").value;
+      u.context_tray.retention_days = parseInt(document.getElementById("ctxRet").value||"0",10);
+      u.context_tray.content = document.getElementById("ctxTxt").value;
+      u.context_tray.updated_at = nowISO();
+      state.users[u.user_id]=u; save(state); logEvt("context_save",{user_id:u.user_id,mode:u.context_tray.mode});
+      toast("Contexto salvo.", u.context_tray.mode);
+    };
+    document.getElementById("btnCtxClear").onclick = ()=>{
+      u.context_tray.content = "";
+      u.context_tray.updated_at = nowISO();
+      state.users[u.user_id]=u; save(state); logEvt("context_clear",{user_id:u.user_id});
+      toast("Contexto limpo.");
+      route("context");
+    };
+    document.getElementById("btnCtxCopy").onclick = async ()=>{
+      const block =
+`===LEV_CONTEXT_TRAY_BEGIN===
+user_id: ${u.user_id}
+mode: ${u.context_tray.mode}
+updated_at: ${u.context_tray.updated_at || nowISO()}
+retention_days: ${u.context_tray.retention_days || 0}
+
+content:
+${u.context_tray.content || ""}
+===LEV_CONTEXT_TRAY_END===`;
+      await navigator.clipboard.writeText(block);
+      toast("Bloco CONTEXT_TRAY copiado.");
+    };
+    return;
+  }
+
+  if(id==="trays"){
+    viewTitle("Bandejas");
+    const ro = isReadOnly(u);
+    v.innerHTML = `
+      <div class="muted">
+        Gere bandejas para exportação/auditoria. ${ro ? '<span class="warnText">READ_ONLY: exportação bloqueada.</span>' : ''}
+      </div>
+      <div class="hr"></div>
+      <div class="btnrow">
+        <button class="ok" id="btnExit">GERAR BANDEJA_SAIDA</button>
+        ${u.role==="ADM" ? `<button class="warn" id="btnAdminExit">GERAR ADMIN_EXIT_TRAY</button>` : ``}
+        <button class="secondary" id="btnCopyExit">Copiar EXIT_TRAY</button>
+        ${u.role==="ADM" ? `<button class="secondary" id="btnCopyAdminExit">Copiar ADMIN_EXIT_TRAY</button>` : ``}
+      </div>
+      <div class="hr"></div>
+      <div class="split">
+        <div>
+          <label class="muted">EXIT_TRAY</label>
+          <textarea id="outExit" readonly></textarea>
+        </div>
+        <div>
+          <label class="muted">ADMIN_EXIT_TRAY</label>
+          <textarea id="outAdminExit" readonly></textarea>
+        </div>
+      </div>
+    `;
+
+    const outExit = document.getElementById("outExit");
+    const outAdminExit = document.getElementById("outAdminExit");
+
+    outExit.value = u.trays.exit_tray || "";
+    if(outAdminExit) outAdminExit.value = u.trays.admin_exit_tray || "";
+
+    document.getElementById("btnExit").onclick = ()=>{
+      if(isReadOnly(u)){
+        toast("READ_ONLY: não pode gerar bandeja de saída.", "Ative Gate e tenha licença ACTIVE.");
+        return;
+      }
+      const li = licenseInfo(u);
+      const tray =
+`===LEV_EXIT_TRAY_BEGIN===
+user_id: ${u.user_id}
+generated_at: ${nowISO()}
+source: site_session
+role: ${u.role}
+pb_version: ${PB_VERSION}
+
+scope:
+- preferencias
+- perfil_operacional
+- user_space
+- contexto_resumido
+- decisoes
+
+preferencias:
+- idioma: ${u.preferences.idioma}
+- formato_resposta: ${u.preferences.formato_resposta}
+- nivel_detalhe: ${u.preferences.nivel_detalhe}
+- modo_perguntas: ${u.preferences.modo_perguntas}
+
+perfil_operacional:
+- style: ${u.perfil_operacional.style}
+- format: ${u.perfil_operacional.format}
+- ask_bias: ${u.perfil_operacional.ask_bias}
+- cadence: ${u.perfil_operacional.cadence}
+- risk_posture: ${u.perfil_operacional.risk_posture}
+
+user_space_resumo:
+- listas: ${u.user_space.listas ? "preenchido" : "vazio"}
+- afazeres: ${u.user_space.afazeres ? "preenchido" : "vazio"}
+- projetos: ${u.user_space.projetos ? "preenchido" : "vazio"}
+- compras: ${u.user_space.compras ? "preenchido" : "vazio"}
+- financeiro: ${u.user_space.financeiro ? "preenchido" : "vazio"}
+- planilhas: ${u.user_space.planilhas ? "preenchido" : "vazio"}
+- anotacoes: ${u.user_space.anotacoes ? "preenchido" : "vazio"}
+
+contexto_resumido:
+- mode: ${u.context_tray.mode}
+- objetivo_principal: uso do LEV com governanca e copia-e-cola
+- estado_atual: site MVP local, pronto para backend
+- licenca: ${li.status} (${li.expires_in_days}d)
+
+decisoes_confirmadas:
+- site e autoridade de identidade/licenca/persistencia (producao)
+- chat e ambiente de simulacao (quando usado)
+- sem auto-aplicacao
+- patches review_only
+
+restricoes_reafirmadas:
+- sem inferencia sensivel
+- sem diagnostico
+- sem aprendizagem individual
+- sem persistencia oculta
+
+observacoes_finais:
+- sessao pode ser encerrada com seguranca
+===LEV_EXIT_TRAY_END===`;
+      u.trays.exit_tray = tray;
+      state.users[u.user_id]=u; save(state); logEvt("exit_tray_gen",{user_id:u.user_id});
+      outExit.value = tray;
+      toast("BANDEJA_SAIDA gerada.");
+    };
+
+    if(u.role==="ADM"){
+      document.getElementById("btnAdminExit").onclick = ()=>{
+        if(isReadOnly(u)){
+          toast("READ_ONLY: não pode gerar bandeja ADM.", "Ative Gate e tenha licença ACTIVE.");
+          return;
+        }
+        const tray =
+`===LEV_ADMIN_EXIT_TRAY_BEGIN===
+admin_id: ${u.user_id}
+generated_at: ${nowISO()}
+source: site_session
+role: ADM
+pb_version: ${PB_VERSION}
+
+decisoes_estruturais:
+- PB como fonte unica da verdade
+- separacao Prompt / IA / Sistema
+- edicao via patch
+- sem auto-aplicacao
+
+governanca_reafirmada:
+- ADM via role externo
+- login/licenca fora do PB
+- site como autoridade (producao)
+
+seguranca_reafirmada:
+- sem credenciais no PB
+- sem tokens embutidos
+- API protegida no backend (producao)
+
+mecanismos_de_integridade:
+- PB_ACCESS_GATE
+- BOOT_TRAY
+- UPDATE_TRAY
+- EXIT_TRAY
+- ADMIN_EXIT_TRAY
+
+status_final:
+- pronto_para_deploy: SIM
+- pendencias: nenhuma
+===LEV_ADMIN_EXIT_TRAY_END===`;
+        u.trays.admin_exit_tray = tray;
+        state.users[u.user_id]=u; save(state); logEvt("admin_exit_tray_gen",{user_id:u.user_id});
+        outAdminExit.value = tray;
+        toast("ADMIN_EXIT_TRAY gerada.");
+      };
+    }
+
+    document.getElementById("btnCopyExit").onclick = async ()=>{
+      await navigator.clipboard.writeText(outExit.value || "");
+      toast("EXIT_TRAY copiada.");
+    };
+    if(u.role==="ADM"){
+      document.getElementById("btnCopyAdminExit").onclick = async ()=>{
+        await navigator.clipboard.writeText(outAdminExit.value || "");
+        toast("ADMIN_EXIT_TRAY copiada.");
+      };
+    }
+    return;
+  }
+
+  if(id==="sync"){
+    viewTitle("Sync Copia-e-Cola");
+    const ro = isReadOnly(u);
+    const li = licenseInfo(u);
+
+    const download = () => {
+      const bundleId = "BND-" + nowISO().slice(0,10).replaceAll("-","") + "-" + Math.random().toString(36).slice(2,6).toUpperCase();
+      const issued = new Date();
+      const exp = addDays(issued, 30);
+      // sig/nonce aqui é DEMO
+      return `===LEV_DOWNLOAD_BEGIN===
+user_id: ${u.user_id}
+bundle_id: ${bundleId}
+issued_at: ${issued.toISOString()}
+expires_at: ${exp.toISOString()}
+license_status: ${li.status}
+expires_in_days: ${li.expires_in_days}
+pb_version: ${PB_VERSION}
+
+preferences:
+idioma=${u.preferences.idioma}
+formato_resposta=${u.preferences.formato_resposta}
+nivel_detalhe=${u.preferences.nivel_detalhe}
+modo_perguntas=${u.preferences.modo_perguntas}
+
+perfil_operacional:
+style=${u.perfil_operacional.style}
+format=${u.perfil_operacional.format}
+ask_bias=${u.perfil_operacional.ask_bias}
+cadence=${u.perfil_operacional.cadence}
+risk_posture=${u.perfil_operacional.risk_posture}
+
+user_space:
+[listas]
+${u.user_space.listas || ""}
+
+[afazeres]
+${u.user_space.afazeres || ""}
+
+[projetos]
+${u.user_space.projetos || ""}
+
+[compras]
+${u.user_space.compras || ""}
+
+[financeiro]
+${u.user_space.financeiro || ""}
+
+[planilhas]
+${u.user_space.planilhas || ""}
+
+[anotacoes]
+${u.user_space.anotacoes || ""}
+
+context_tray:
+mode=${u.context_tray.mode}
+content=${(u.context_tray.content||"").replaceAll("\n","\\n")}
+
+sig: SIG_DEMO_${Math.random().toString(36).slice(2,10).toUpperCase()}
+===LEV_DOWNLOAD_END===`;
+    };
+
+    v.innerHTML = `
+      <div class="muted">
+        <b>Download</b> (site → copiar) e <b>Upload</b> (colar → site).<br/>
+        ${ro ? '<span class="warnText">READ_ONLY: download/exportação bloqueada.</span>' : 'Use para sincronizar dados em texto.'}
+      </div>
+      <div class="hr"></div>
+
+      <div class="split">
+        <div>
+          <h3 style="margin:0 0 8px 0; font-size:13px;">GERAR LEV_DOWNLOAD</h3>
+          <div class="btnrow">
+            <button class="ok" id="btnGenDL" ${ro?'disabled':''}>GERAR LEV_DOWNLOAD PARA SITE</button>
+            <button class="secondary" id="btnCopyDL">Copiar</button>
+          </div>
+          <div class="field">
+            <label>LEV_DOWNLOAD</label>
+            <textarea id="dlBox" readonly></textarea>
+          </div>
+        </div>
+
+        <div>
+          <h3 style="margin:0 0 8px 0; font-size:13px;">COLAR LEV_UPLOAD</h3>
+          <div class="muted">Cole um bloco <span class="mono">LEV_UPLOAD</span> aqui para importar dados (demo).</div>
+          <div class="field">
+            <label>LEV_UPLOAD</label>
+            <textarea id="upBox" placeholder="Cole aqui..."></textarea>
+          </div>
+          <div class="btnrow">
+            <button class="warn" id="btnApplyUp">Aplicar Upload</button>
+            <button class="secondary" id="btnClearUp">Limpar</button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const dlBox = document.getElementById("dlBox");
+    const upBox = document.getElementById("upBox");
+    document.getElementById("btnGenDL").onclick = ()=>{
+      dlBox.value = download();
+      logEvt("download_gen",{user_id:u.user_id});
+      toast("LEV_DOWNLOAD gerado.");
+    };
+    document.getElementById("btnCopyDL").onclick = async ()=>{
+      await navigator.clipboard.writeText(dlBox.value || "");
+      toast("LEV_DOWNLOAD copiado.");
+    };
+
+    document.getElementById("btnClearUp").onclick = ()=> upBox.value = "";
+
+    document.getElementById("btnApplyUp").onclick = ()=>{
+      // Demo parser: procura blocos simples "payload_type" e "payload"
+      const raw = upBox.value || "";
+      if(!raw.includes("===LEV_UPLOAD_BEGIN===") || !raw.includes("===LEV_UPLOAD_END===")){
+        toast("Upload inválido.", "Bloco LEV_UPLOAD não detectado.");
+        return;
+      }
+      // Apenas demo: não valida sig/nonce.
+      // Produção: validar user_id da sessão + nonce + sig + expiração.
+      const get = (k)=>{
+        const m = raw.match(new RegExp("^"+k+"\\s*:\\s*(.*)$","m"));
+        return m ? m[1].trim() : "";
+      };
+      const uid = get("user_id");
+      if(uid && uid !== u.user_id){
+        toast("user_id não confere.", "Em produção isso seria bloqueado.");
+        return;
+      }
+      const ptype = get("payload_type");
+      const payloadMatch = raw.match(/payload:\s*([\s\S]*?)\n\s*sig:/m);
+      const payload = payloadMatch ? payloadMatch[1].trim() : "";
+
+      if(!ptype){
+        toast("payload_type ausente.", "Use prefs|perfil|user_space|context_tray|annotations|drafts|patch");
+        return;
+      }
+
+      if(isReadOnly(u)){
+        toast("READ_ONLY: importação bloqueada.", "Ative Gate e tenha licença ACTIVE.");
+        return;
+      }
+
+      // Aplicações simples
+      if(ptype === "prefs"){
+        // Espera linhas chave=valor
+        payload.split("\n").forEach(line=>{
+          const [k,v] = line.split("=").map(s=> (s||"").trim());
+          if(k && v) u.preferences[k] = v;
+        });
+      } else if(ptype === "perfil"){
+        payload.split("\n").forEach(line=>{
+          const [k,v] = line.split("=").map(s=> (s||"").trim());
+          if(k && v) u.perfil_operacional[k] = v;
+        });
+      } else if(ptype === "context_tray"){
+        u.context_tray.content = payload;
+        u.context_tray.updated_at = nowISO();
+      } else if(ptype === "user_space" || ptype === "annotations"){
+        // Demo: se vier com cabeçalho [categoria]
+        const parts = payload.split(/\n\[(listas|afazeres|projetos|compras|financeiro|planilhas|anotacoes)\]\n/i);
+        for(let i=1;i<parts.length;i+=2){
+          const cat = parts[i].toLowerCase();
+          const txt = (parts[i+1]||"").trim();
+          if(u.user_space[cat] !== undefined) u.user_space[cat] = txt;
+        }
+      } else {
+        // outros: apenas registra
+        logEvt("upload_payload_other",{ptype});
+      }
+
+      state.users[u.user_id]=u; save(state);
+      logEvt("upload_applied",{user_id:u.user_id, payload_type:ptype});
+      toast("Upload aplicado (demo).", `payload_type=${ptype}`);
+      route("home");
+    };
+
+    return;
+  }
+
+  if(id==="commands"){
+    viewTitle("Comandos ADM");
+    v.innerHTML = `
+      <div class="muted">
+        Lista consolidada (referência canônica). Em produção, isso vira CLI/painel.
+      </div>
+      <div class="hr"></div>
+      <textarea readonly>
+[LEV — MODO ADM] (referência)
+
+ESTADO / OPERAÇÃO
+- STATUS LEV
+- VER PB_VERSION
+- VER MODO_ATIVO
+- VER ESTADO_GERAL
+- ENTRAR MODO ADM
+- SAIR MODO ADM
+- ENCERRAR SESSAO LEV
+
+GOVERNANÇA / CONTROLE
+- VER PB_ACCESS_GATE
+- VER RESTRICOES
+- VER PROIBICOES
+- VER POLITICA_ATUALIZACAO
+- VER MODO_REDE
+- VER PRIORIDADE_ATUAL
+
+SEGURANÇA (MANUAL / CONTROLADA)
+- LEV_SECURITY_APPLY MODE=manual RISK=low
+- LEV_SECURITY_VERIFY CHECKS=root,health,api_ping RISK=low
+- LEV_TOKEN_ROTATE RISK=medium
+- LEV_LOCK_ALL ENABLE=0 RISK=low
+- LEV_LOCK_ALL ENABLE=1 RISK=medium
+
+BASELINE / VERSÕES
+- LEV_BASELINE_STATUS
+- LEV_BASELINE_FREEZE TAG=<nome>
+- LEV_BASELINE_COMPARE TAG_A TAG_B
+
+ATUALIZAÇÃO / REINTEGRAÇÃO
+- UPDATE
+- GERAR BOOT_TRAY
+- GERAR UPDATE_TRAY
+- ATUALIZAR LEV MAXIMO BUDGET_MIN=<n> RISCO_MAX=<BAIXO|MEDIO|ALTO>
+- VER FILA_DE_PATCHES
+- VER CHECKPOINT_FINAL
+
+EDIÇÃO DO LEV (NUNCA AUTOMÁTICA)
+- EDITAR PB
+- SIMULAR ALTERACAO PB
+- REESCREVER SECAO PB
+- GERAR PATCH
+- REVISAR PATCH
+- COMPARAR VERSOES PB
+
+PATCH / APLICAÇÃO CONTROLADA
+- LEV_APPLY_PATCH ONECLICK=menu_admin RISK=medium
+- VER PATCHES_PENDENTES
+- VER PATCHES_APLICADOS
+
+CONTEXTO / BANDEJAS
+- CONTEXTO ON MODO=MANUAL|AUTO_RESUMO|FULL
+- CONTEXTO OFF / VER / LIMPAR / ADICIONAR / RESUMIR
+- GERAR BANDEJA_SAIDA
+- GERAR ADMIN_EXIT_TRAY
+
+EXPORTAÇÃO / IMPORTAÇÃO
+- GERAR LEV_DOWNLOAD PARA SITE
+- COLAR LEV_UPLOAD DO SITE
+- EXPORTAR LEV PARA SITE COM BANDEJA
+
+SATÉLITE
+- ABRIR SATELITE / SAIR SATELITE
+- SIMULAR ALTERACAO / TESTAR REGRA / REESCREVER SECAO
+- COMPARAR VERSOES / GERAR PATCH / DESCARTAR SIMULACAO
+
+LOGS / AUDITORIA
+- VER LOGS / VER LOGS DE UPDATE / ERRO / SEGURANCA / PATCH / EXPORTACAO
+      </textarea>
+    `;
+    return;
+  }
+
+  if(id==="logs"){
+    viewTitle("Logs");
+    const rows = state.logs.slice(0,80).map(e=>`• ${e.at}  ${e.type}  ${JSON.stringify(e.details||{})}`).join("\n");
+    v.innerHTML = `
+      <div class="muted">Log local (append-only) — demo. Em produção: server logs + auditoria.</div>
+      <div class="hr"></div>
+      <textarea readonly>${rows || "(sem logs)"}</textarea>
+      <div class="btnrow">
+        <button class="secondary" id="btnCopyLogs">Copiar</button>
+      </div>
+    `;
+    document.getElementById("btnCopyLogs").onclick = async ()=>{
+      await navigator.clipboard.writeText(rows || "");
+      toast("Logs copiados.");
+    };
+    return;
+  }
+
+  // fallback
+  viewTitle("Tela");
+  v.innerHTML = `<div class="muted">Tela não encontrada.</div>`;
+}
+
+document.getElementById("btnReset").onclick = ()=>{
+  if(!confirm("Apagar todos os dados locais do LEV (MVP)?")) return;
+  localStorage.removeItem(STORE_KEY);
+  state = load();
+  toast("Reset concluído.");
+  route("login");
+};
+
+document.getElementById("btnExportAll").onclick = async ()=>{
+  const u = currentUser();
+  const dump = {
+    pb_version: PB_VERSION,
+    access_gate: state.access_gate,
+    session: state.session,
+    user: u ? {
+      user_id:u.user_id, role:u.role, username:u.username,
+      license: u.license,
+      preferences:u.preferences,
+      perfil_operacional:u.perfil_operacional,
+      context_tray:u.context_tray,
+      user_space:u.user_space,
+      trays:u.trays
+    } : null,
+    logs: state.logs.slice(0,200)
+  };
+  await navigator.clipboard.writeText(JSON.stringify(dump, null, 2));
+  toast("Exportado para a área de transferência.", "JSON do estado local (MVP).");
+};
+
+(function init(){
+  setChips();
+  renderNav("login");
+  route(state.session.logged_in ? "home" : "login");
+})();
 </script>
 </body>
 </html>
